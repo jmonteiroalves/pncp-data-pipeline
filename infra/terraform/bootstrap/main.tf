@@ -28,7 +28,7 @@ locals {
   ]
 
   deploy_roles = [
-    "roles/artifactregistry.writer",
+    "roles/artifactregistry.admin",
     "roles/bigquery.admin",
     "roles/cloudscheduler.admin",
     "roles/iam.serviceAccountAdmin",
