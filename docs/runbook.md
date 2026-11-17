@@ -7,7 +7,7 @@
 | `PNCP — job errors` | Cloud Monitoring email | Any `ERROR` log from a Cloud Run job |
 | `PNCP — 429 storm` | Cloud Monitoring email | More than 10 rate-limit retries in 15 minutes |
 | `PNCP — invalid LLM responses` | Cloud Monitoring email | Gemini returned unparseable or misaligned JSON |
-| `PNCP — no ingestion in 26 hours` | Cloud Monitoring email | The daily delta metric stopped reporting |
+| `PNCP — no ingestion in 23h30m` | Cloud Monitoring email | The daily delta metric stopped reporting |
 | Budget alert | Cloud Billing | 50%, 90%, or 100% of the R$ 50 monthly budget |
 | Operations dashboard | Cloud Monitoring → Dashboards → PNCP operations | Error, 429, invalid LLM, and delta volume |
 
