@@ -1,0 +1,59 @@
+main:
+  steps:
+    - init:
+        assign:
+          - project_id: ${sys.get_env("PROJECT_ID")}
+          - region: ${sys.get_env("REGION")}
+          - ingest_job: ${"projects/" + project_id + "/locations/" + region + "/jobs/pncp-ingest"}
+          - dbt_job: ${"projects/" + project_id + "/locations/" + region + "/jobs/pncp-dbt"}
+          - enrich_job: ${"projects/" + project_id + "/locations/" + region + "/jobs/pncp-enrich"}
+    - ingest:
+        call: run_job
+        args:
+          job: ${ingest_job}
+        result: ingest_result
+    - dbt_silver:
+        call: run_job
+        args:
+          job: ${dbt_job}
+        result: dbt_silver_result
+    - enrich:
+        call: run_job
+        args:
+          job: ${enrich_job}
+        result: enrich_result
+    - dbt_gold:
+        call: run_job
+        args:
+          job: ${dbt_job}
+        result: dbt_gold_result
+    - done:
+        return: "pipeline completed"
+
+run_job:
+  params: [job]
+  steps:
+    - start:
+        call: googleapis.run.v2.projects.locations.jobs.run
+        args:
+          name: ${job}
+        result: operation
+    - poll:
+        call: googleapis.run.v2.projects.locations.operations.get
+        args:
+          name: ${operation.name}
+        result: status
+    - check:
+        switch:
+          - condition: ${status.done == true and status.error != null}
+            raise: ${status.error}
+          - condition: ${status.done == true}
+            next: finish
+        next: wait
+    - wait:
+        call: sys.sleep
+        args:
+          seconds: 15
+        next: poll
+    - finish:
+        return: ${status}
