@@ -33,6 +33,8 @@ locals {
     "roles/cloudscheduler.admin",
     "roles/iam.serviceAccountAdmin",
     "roles/iam.serviceAccountUser",
+    "roles/logging.admin",
+    "roles/monitoring.admin",
     "roles/resourcemanager.projectIamAdmin",
     "roles/run.admin",
     "roles/serviceusage.serviceUsageAdmin",
