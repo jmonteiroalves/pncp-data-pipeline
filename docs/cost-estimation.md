@@ -54,7 +54,7 @@ Volumes are estimates based on a single weekday sample. They are sufficient for 
 | **Free within limits** | Cloud Scheduler (3 jobs), Cloud Workflows (5,000 steps), Cloud Logging (50 GiB) | No charge if the usage stays below the monthly limit |
 | **Conditionally free** | Cloud Storage, BigQuery, Cloud Run Jobs, Artifact Registry | Free only in specific regions or under specific usage limits, aggregated per billing account |
 | **Paid** | Vertex AI Gemini | No free tier for these models; the expected bill is almost entirely here |
-| **Free product** | Looker Studio | No licence cost for the usage described here |
+| **Free product** | GitHub Pages (static dashboard) | No hosting cost; Looker Studio remains an optional free path |
 
 The expected bill is therefore **not zero**, even though most infrastructure stays inside free tiers. The paid component is the LLM.
 
@@ -191,7 +191,7 @@ Free tiers are not a guarantee of a zero bill.
 3. **BigQuery query free tier.** The first 1 TiB per month applies to on-demand pricing. Capacity pricing or editions have different rules.
 4. **Vertex AI has no free tier** for these models. The LLM cost is real.
 5. **Minimum billing.** Cloud Run Jobs bill at least one minute per instance.
-6. **Network egress.** Internet egress is not included in this estimate. Dashboard usage through Looker Studio does not require serving data from a VM.
+6. **Network egress.** Internet egress is not included in this estimate. The static dashboard is served by GitHub Pages, so it does not generate GCP egress.
 7. **Backfill month operations.** The one-time backfill writes roughly 8,300 objects, which can exceed the 5,000 free Class A operations by a few thousand. The additional cost is below US$ 0.02.
 8. **Price changes.** All figures must be revalidated before implementation.
 
@@ -222,7 +222,7 @@ The US$ 300 new-customer trial credit covers the first months of this project wi
 
 - Development time and opportunity cost.
 - Taxes (ISS, IOF) and BRL/USD variation.
-- Paid Looker Studio Pro features.
+- Paid Looker Studio Pro features, if the optional manual report is used.
 - A custom domain or hosting for a public web app.
 - Support plans.
 - Any future item-level ingestion or streaming architecture.

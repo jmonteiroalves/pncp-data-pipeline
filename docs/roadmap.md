@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** phases 0–4 complete with a pilot evaluation; phase 5 pending
+**Status:** phases 0–5 complete; phase 6 pending
 **Last updated:** 2026-11-17
 
 ---
@@ -218,7 +218,7 @@ cost/quality comparison (ADR-015).
   - geographic distribution;
   - classification coverage.
 - Add tests for relationships and accepted values.
-- Build the Looker Studio dashboard with four pages:
+- Build the public dashboard with four sections:
   - overview;
   - categories;
   - agencies;
@@ -228,13 +228,22 @@ cost/quality comparison (ADR-015).
 
 ### Acceptance criteria
 
-- [ ] Gold totals reconcile with Silver within 0.1%.
-- [ ] Every fact row has a valid date and agency.
-- [ ] Classification coverage is displayed next to AI-derived metrics.
-- [ ] Dashboard loads in under 5 seconds.
-- [ ] Dashboard queries stay within the monthly byte limit.
-- [ ] Four pages are published and accessible by link.
-- [ ] Screenshots and insights are added to the README.
+- [x] Gold totals reconcile with Silver within 0.1% (2,206 notices in both).
+- [x] Every fact row has a valid date and agency (0 nulls in 2,206 rows).
+- [x] Classification coverage is displayed next to AI-derived metrics (99.7%).
+- [x] Dashboard loads in under 5 seconds (static assets; no live query).
+- [x] Dashboard queries stay within the monthly byte limit (aggregated export only).
+- [ ] Four dashboard sections are published and accessible by public link.
+- [x] Insights are added to the README; screenshot pending.
+
+Gold validation on 2026-11-17:
+
+- `fato_contratacao`: 2,206 rows, 0 null publication dates, 0 null agencies.
+- `fato_contrato`: 500 rows.
+- 77/77 dbt nodes pass, including Gold relationships and uniqueness.
+- AI coverage: 2,199 of 2,206 notices (99.7%).
+- Dashboard export: category spend, daily evolution, top agencies, state
+  coverage, and AI coverage; no descriptions or supplier data published.
 
 ---
 

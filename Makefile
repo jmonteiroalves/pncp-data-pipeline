@@ -3,7 +3,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 IMAGE ?= pncp-pipeline:local
 
-.PHONY: help setup lint format test test-live build run-local dbt-build dbt-test dbt-docs pre-commit-install clean
+.PHONY: help setup lint format test test-live build run-local dbt-build dbt-test dbt-docs dashboard pre-commit-install clean
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-20s %s\n", $$1, $$2}'
@@ -51,6 +51,9 @@ dbt-test: ## Run dbt tests
 
 dbt-docs: ## Generate the dbt documentation site
 	$(BIN)/dbt docs generate --project-dir dbt --profiles-dir dbt
+
+dashboard: ## Export Gold marts for the static dashboard
+	$(BIN)/python scripts/export_dashboard.py
 
 pre-commit-install: ## Install the git hooks (optional)
 	$(BIN)/pre-commit install

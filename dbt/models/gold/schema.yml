@@ -1,0 +1,96 @@
+version: 2
+
+models:
+  - name: dim_categoria
+    description: Controlled taxonomy plus the "not classified" placeholder.
+    columns:
+      - name: categoria
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fato_contratacao
+    description: One row per PNCP notice with the latest AI category.
+    columns:
+      - name: contratacao_key
+        data_tests:
+          - unique
+          - not_null
+      - name: numero_controle_pncp
+        data_tests:
+          - unique
+          - not_null
+      - name: categoria
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_categoria')
+                field: categoria
+      - name: data_publicacao_dia
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tempo')
+                field: data
+
+  - name: fato_contrato
+    description: One row per PNCP contract, inheriting the notice category when linked.
+    columns:
+      - name: contrato_key
+        data_tests:
+          - unique
+          - not_null
+      - name: numero_controle_pncp
+        data_tests:
+          - unique
+          - not_null
+      - name: categoria
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_categoria')
+                field: categoria
+
+  - name: agg_gastos_categoria
+    description: Monthly spend and coverage by category.
+    columns:
+      - name: mes
+        data_tests:
+          - not_null
+      - name: categoria
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_categoria')
+                field: categoria
+
+  - name: agg_orgaos
+    description: Spend by agency and category.
+    columns:
+      - name: cnpj_orgao
+        data_tests:
+          - not_null
+
+  - name: agg_tendencias
+    description: Monthly spend by category with a three-month moving average.
+    columns:
+      - name: mes
+        data_tests:
+          - not_null
+
+  - name: agg_cobertura_ia
+    description: Monthly classification coverage.
+    columns:
+      - name: mes
+        data_tests:
+          - unique
+          - not_null
+
+  - name: agg_uf
+    description: Spend and classification coverage by state.
+    columns:
+      - name: uf
+        data_tests:
+          - unique
+          - not_null

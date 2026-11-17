@@ -83,6 +83,7 @@ flowchart TB
   BQS --> DBTJ
   BQA --> DBTJ
   DBTJ --> BQG
+  BQG --> DASH["Static dashboard<br/>GitHub Pages"]
   ING -.-> LOG
   DBTJ -.-> LOG
   ENR -.-> LOG
@@ -108,6 +109,7 @@ flowchart TB
 | Cloud Logging | Structured application logs | JSON logs, 30-day retention |
 | Cloud Monitoring | Metrics, alerts, dashboards | Log-based metrics and uptime checks |
 | Cloud Billing | Budget and spend alerts | US$ 10 budget, alerts at 50%, 90%, 100% |
+| Static dashboard | Public portfolio view | Chart.js on GitHub Pages; data exported from Gold marts |
 | Terraform | Provisions all resources | Remote state in GCS, per-environment workspaces |
 | GitHub Actions | Lint, test, build, plan, apply, deploy | Workload Identity Federation, no keys |
 

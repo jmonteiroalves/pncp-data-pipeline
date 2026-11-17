@@ -21,6 +21,7 @@ This file records the significant decisions made during the design phase, the al
 | ADR-013 | SQLite mirror for local development and tests | Accepted |
 | ADR-014 | Backfill in 3-day chunks | Accepted |
 | ADR-015 | Switch default model to Gemini 3.1 Flash-Lite | Accepted |
+| ADR-016 | Static Git-hosted dashboard instead of Looker Studio | Accepted |
 
 ---
 
@@ -547,3 +548,46 @@ to US$ 0.25 input and US$ 1.50 output per 1M tokens.
 - Quality is slightly lower but still above the gate.
 - `model_id` is stored per row, so both models can coexist and be compared.
 - Re-evaluate when the full 300-label golden set is reviewed or the prompt changes.
+
+---
+
+## ADR-016 — Static Git-hosted dashboard instead of Looker Studio
+
+**Date:** 2026-11-17
+**Status:** Accepted
+
+### Context
+
+Phase 5 needs a public dashboard for the portfolio. The original design used
+Looker Studio. During implementation:
+
+- The Looker Studio API only searches and manages existing assets; it cannot
+  create reports or charts.
+- The API requires a Google Workspace or Cloud Identity organization with
+  domain-wide delegation, and the project account is a personal Gmail account.
+- A manual report would not be reproducible from the repository and would need
+  browser work outside the codebase.
+
+### Decision
+
+Deliver a static dashboard (`docs/dashboard/`) built with Chart.js and served by
+GitHub Pages. A Python export script queries the Gold marts and writes an
+aggregated `data.json`. Looker Studio remains documented as an optional manual
+setup against the same Gold tables.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|---|---|
+| Manual Looker Studio report | Not reproducible; no API for report creation |
+| Looker Studio embedding | Still requires a manually built report |
+| Streamlit on Cloud Run | Adds a running service and cost for a demo |
+| Notebook screenshot | Not interactive or linkable |
+
+### Consequences
+
+- The dashboard is public, free, and versioned with the code.
+- Refreshes are explicit: run the export script and commit `data.json`.
+- Interactivity is limited to chart tooltips; no date/category filters yet.
+- A scheduled refresh can be added in phase 6 with GitHub Actions.
+- The Looker Studio path remains available for a future enterprise version.

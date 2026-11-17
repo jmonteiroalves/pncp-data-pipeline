@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: ai
+    description: LLM classification results written by the enrichment job.
+    schema: ai
+    tables:
+      - name: classificacao
+        description: One row per classified description, model, and prompt version.
+        columns:
+          - name: description_hash
+            tests:
+              - not_null
+          - name: categoria
+            tests:
+              - not_null

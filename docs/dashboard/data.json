@@ -1,0 +1,293 @@
+{
+  "generated_at": "2026-11-17T14:49:08.098291+00:00",
+  "source": "PNCP + Gemini on Vertex AI",
+  "kpis": {
+    "notices": 2206,
+    "classified": 2199,
+    "agencies": 1302,
+    "estimated_value": 4679698621.9,
+    "awarded_value": 5429626868.16
+  },
+  "categories": [
+    {
+      "categoria": "Saúde",
+      "notices": 485,
+      "estimated_value": 1252107304.63,
+      "awarded_value": 746144845.41
+    },
+    {
+      "categoria": "Serviços gerais",
+      "notices": 519,
+      "estimated_value": 839208346.48,
+      "awarded_value": 368641793.79
+    },
+    {
+      "categoria": "Transporte",
+      "notices": 340,
+      "estimated_value": 717045963.65,
+      "awarded_value": 3281338411.21
+    },
+    {
+      "categoria": "Infraestrutura",
+      "notices": 199,
+      "estimated_value": 657803803.47,
+      "awarded_value": 359649070.61
+    },
+    {
+      "categoria": "Alimentação",
+      "notices": 258,
+      "estimated_value": 574189185.58,
+      "awarded_value": 318481759.62
+    },
+    {
+      "categoria": "Tecnologia",
+      "notices": 177,
+      "estimated_value": 424766272.89,
+      "awarded_value": 254276413.08
+    },
+    {
+      "categoria": "Outros",
+      "notices": 221,
+      "estimated_value": 195494406.04,
+      "awarded_value": 99297247.19
+    },
+    {
+      "categoria": "Não classificado",
+      "notices": 7,
+      "estimated_value": 19083339.16,
+      "awarded_value": 1797327.25
+    }
+  ],
+  "daily": {
+    "labels": [
+      "2026-01-14",
+      "2026-01-15"
+    ],
+    "series": [
+      {
+        "categoria": "Alimentação",
+        "values": [
+          362228654.2,
+          211960531.38
+        ]
+      },
+      {
+        "categoria": "Infraestrutura",
+        "values": [
+          431201380.3,
+          226602423.17
+        ]
+      },
+      {
+        "categoria": "Não classificado",
+        "values": [
+          18946149.4,
+          137189.76
+        ]
+      },
+      {
+        "categoria": "Outros",
+        "values": [
+          97872613.88,
+          97621792.16
+        ]
+      },
+      {
+        "categoria": "Saúde",
+        "values": [
+          875334271.62,
+          376773033.01
+        ]
+      },
+      {
+        "categoria": "Serviços gerais",
+        "values": [
+          399726243.28,
+          439482103.2
+        ]
+      },
+      {
+        "categoria": "Tecnologia",
+        "values": [
+          252323338.98,
+          172442933.91
+        ]
+      },
+      {
+        "categoria": "Transporte",
+        "values": [
+          487929051.71,
+          229116911.94
+        ]
+      }
+    ]
+  },
+  "agencies": [
+    {
+      "orgao": "SECRETARIA DE ESTADO DA ADMINISTRACAO",
+      "uf": "SC",
+      "notices": 4,
+      "estimated_value": 160224586.08
+    },
+    {
+      "orgao": "DNIT-DEPARTAMENTO NACIONAL DE INFRAEST DE TRANSPORTES",
+      "uf": "RO",
+      "notices": 1,
+      "estimated_value": 144417448.17
+    },
+    {
+      "orgao": "CONSORCIO INTERFEDERATIVO MINAS GERAIS - CIMINAS",
+      "uf": "MG",
+      "notices": 2,
+      "estimated_value": 127066127.5
+    },
+    {
+      "orgao": "SECRETARIA DE ESTADO DA ADMINISTRACAO",
+      "uf": "PB",
+      "notices": 8,
+      "estimated_value": 115603329.2
+    },
+    {
+      "orgao": "ESTADO DO CEARA",
+      "uf": "CE",
+      "notices": 26,
+      "estimated_value": 115199213.22
+    },
+    {
+      "orgao": "SECRETARIA DE AGRICULTURA E ABASTECIMENTO",
+      "uf": "SP",
+      "notices": 1,
+      "estimated_value": 105631337.68
+    },
+    {
+      "orgao": "COMANDO DO EXERCITO",
+      "uf": "PR",
+      "notices": 2,
+      "estimated_value": 101131076.75
+    },
+    {
+      "orgao": "MUNICIPIO DE CUIABA",
+      "uf": "MT",
+      "notices": 1,
+      "estimated_value": 97962758.76
+    },
+    {
+      "orgao": "FUNDO ESTADUAL DE SAUDE DO ESTADO DA BAHIA",
+      "uf": "BA",
+      "notices": 14,
+      "estimated_value": 87731984.62
+    },
+    {
+      "orgao": "MUNICIPIO DE MACAPA",
+      "uf": "AP",
+      "notices": 1,
+      "estimated_value": 79890841.2
+    }
+  ],
+  "states": [
+    {
+      "uf": "MG",
+      "notices": 320,
+      "coverage": 1.0,
+      "estimated_value": 826540652.32
+    },
+    {
+      "uf": "SP",
+      "notices": 344,
+      "coverage": 0.997093023255814,
+      "estimated_value": 463297784.24
+    },
+    {
+      "uf": "RS",
+      "notices": 178,
+      "coverage": 0.9943820224719101,
+      "estimated_value": 333618341.94
+    },
+    {
+      "uf": "BA",
+      "notices": 133,
+      "coverage": 0.9924812030075187,
+      "estimated_value": 292368232.52
+    },
+    {
+      "uf": "SC",
+      "notices": 131,
+      "coverage": 0.9923664122137404,
+      "estimated_value": 269545168.28
+    },
+    {
+      "uf": "RJ",
+      "notices": 94,
+      "coverage": 1.0,
+      "estimated_value": 208924065.87
+    },
+    {
+      "uf": "PR",
+      "notices": 205,
+      "coverage": 0.9951219512195122,
+      "estimated_value": 205242219.2
+    },
+    {
+      "uf": "MA",
+      "notices": 38,
+      "coverage": 1.0,
+      "estimated_value": 195577108.89
+    },
+    {
+      "uf": "PB",
+      "notices": 100,
+      "coverage": 1.0,
+      "estimated_value": 190880748.58
+    },
+    {
+      "uf": "CE",
+      "notices": 94,
+      "coverage": 1.0,
+      "estimated_value": 184564057.03
+    },
+    {
+      "uf": "MT",
+      "notices": 36,
+      "coverage": 1.0,
+      "estimated_value": 176705627.66
+    },
+    {
+      "uf": "ES",
+      "notices": 37,
+      "coverage": 1.0,
+      "estimated_value": 164065120.64
+    },
+    {
+      "uf": "RO",
+      "notices": 24,
+      "coverage": 1.0,
+      "estimated_value": 160945708.19
+    },
+    {
+      "uf": "PA",
+      "notices": 63,
+      "coverage": 0.9841269841269841,
+      "estimated_value": 153774807.8
+    },
+    {
+      "uf": "DF",
+      "notices": 27,
+      "coverage": 1.0,
+      "estimated_value": 131096853.53
+    }
+  ],
+  "coverage": [
+    {
+      "dia": "2026-01-14",
+      "notices": 1206,
+      "classified": 1200,
+      "coverage": 0.9950248756218906
+    },
+    {
+      "dia": "2026-01-15",
+      "notices": 1000,
+      "classified": 999,
+      "coverage": 0.999
+    }
+  ]
+}

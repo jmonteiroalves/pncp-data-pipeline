@@ -2,6 +2,7 @@
     materialized='incremental',
     unique_key='numero_controle_pncp',
     incremental_strategy='merge',
+    on_schema_change='sync_all_columns',
     partition_by={'field': 'data_publicacao_dia', 'data_type': 'date'},
     cluster_by=['cnpj_orgao', 'fornecedor_ni']
 ) }}

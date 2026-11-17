@@ -1,6 +1,7 @@
 # PNCP Intelligent Data Pipeline
 
 [![CI](https://github.com/jmonteiroalves/pncp-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/jmonteiroalves/pncp-data-pipeline/actions/workflows/ci.yml)
+[![Dashboard](https://img.shields.io/badge/dashboard-live-5eead4)](https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/)
 
 > An end-to-end batch data engineering project on Google Cloud that turns Brazil's public procurement notices into an analytics-ready, AI-enriched dataset.
 
@@ -67,7 +68,7 @@ flowchart LR
   GEM --> AI[("BigQuery<br/>AI results")]
   DBT --> GOLD["dbt<br/>Gold"]
   AI --> GOLD
-  GOLD --> BI["Looker Studio"]
+  GOLD --> BI["Static dashboard<br/>GitHub Pages"]
   SCH["Cloud Scheduler"] --> WF["Cloud Workflows"]
   WF --> ING
   WF --> DBT
@@ -75,6 +76,21 @@ flowchart LR
 ```
 
 A detailed design is in [docs/architecture.md](docs/architecture.md).
+
+**Live dashboard:** <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/>
+
+### What the dashboard shows
+
+Demo window: **14–15 January 2026** (the cloud API backfill was throttled; the
+7-day local backfill is validated separately).
+
+- **2,206 notices**, **1,302 agencies**, **R$ 4.68 bn** estimated.
+- **99.7% AI coverage** (2,199 of 2,206 notices).
+- Leading categories by estimated value: **Saúde** (R$ 1.25 bn), **Serviços
+  gerais** (R$ 839 m), **Transporte** (R$ 717 m), **Infraestrutura** (R$ 658 m).
+- The largest single category by count is **Serviços gerais** (519 notices).
+- The dashboard shows category spend, daily evolution, top agencies, state
+  coverage, and the AI coverage rate.
 
 ---
 
@@ -91,7 +107,7 @@ A detailed design is in [docs/architecture.md](docs/architecture.md).
 | Packaging | Docker | Reproducible jobs and local development |
 | Infrastructure | Terraform | Repeatable, reviewable environments |
 | CI/CD | GitHub Actions + Workload Identity Federation | No long-lived service account keys |
-| BI | Looker Studio | Free, shareable dashboard for the portfolio |
+| BI | Static Chart.js dashboard on GitHub Pages | Public, free, reproducible; Looker Studio is documented as an optional manual setup |
 
 ---
 
@@ -231,6 +247,8 @@ for the same text twice.
 | [Cost estimation](docs/cost-estimation.md) | Assumptions, unit prices, monthly scenarios, cost controls |
 | [Roadmap](docs/roadmap.md) | Phases, acceptance criteria, risks, deferred items |
 | [Evaluation](evaluation/README.md) | Golden set files, pilot labels, metrics, and caveats |
+| [Dashboard](docs/dashboard/README.md) | Static dashboard, data refresh, local preview |
+| [Looker Studio](docs/looker-studio.md) | Optional manual report against the Gold tables |
 
 ---
 
@@ -241,7 +259,7 @@ for the same text twice.
 - [x] Phase 2 — ingestion and Bronze layer (validated locally and against GCS/BigQuery)
 - [x] Phase 3 — Silver models with dbt
 - [x] Phase 4 — LLM enrichment and evaluation (50-item pilot; full 300-label review pending)
-- [ ] Phase 5 — Gold marts and dashboard
+- [x] Phase 5 — Gold marts and dashboard
 - [ ] Phase 6 — Terraform and CI/CD
 - [ ] Phase 7 — observability and cost controls
 
