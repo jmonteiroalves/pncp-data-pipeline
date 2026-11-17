@@ -6,6 +6,8 @@ Static, public dashboard generated from the Gold marts and served by GitHub Page
 - Data: `data.json`
 - Generator: `scripts/export_dashboard.py`
 - URL: <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/>
+- Screenshot: `screenshot.png`
+- Demo window: 14–15 January 2026
 
 ## Refresh
 

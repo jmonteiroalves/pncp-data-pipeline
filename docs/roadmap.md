@@ -233,8 +233,8 @@ cost/quality comparison (ADR-015).
 - [x] Classification coverage is displayed next to AI-derived metrics (99.7%).
 - [x] Dashboard loads in under 5 seconds (static assets; no live query).
 - [x] Dashboard queries stay within the monthly byte limit (aggregated export only).
-- [ ] Four dashboard sections are published and accessible by public link.
-- [x] Insights are added to the README; screenshot pending.
+- [x] Four dashboard sections are published and accessible by public link.
+- [x] Insights and a screenshot are added to the README.
 
 Gold validation on 2026-11-17:
 

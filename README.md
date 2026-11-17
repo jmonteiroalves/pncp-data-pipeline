@@ -79,6 +79,8 @@ A detailed design is in [docs/architecture.md](docs/architecture.md).
 
 **Live dashboard:** <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/>
 
+![Dashboard](docs/dashboard/screenshot.png)
+
 ### What the dashboard shows
 
 Demo window: **14–15 January 2026** (the cloud API backfill was throttled; the
