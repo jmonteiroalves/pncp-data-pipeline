@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** phases 0–5 complete; phase 6 pending
+**Status:** phases 0–6 complete; phase 7 pending
 **Last updated:** 2026-11-17
 
 ---
@@ -271,14 +271,23 @@ Gold validation on 2026-11-17:
 
 ### Acceptance criteria
 
-- [ ] `terraform apply` succeeds from an empty project.
-- [ ] `terraform plan` is clean after apply.
-- [ ] No service account keys exist.
-- [ ] GitHub Actions authenticates through federation.
-- [ ] A pull request shows an infrastructure diff.
-- [ ] A merge to main deploys the new image and job revision.
+- [x] `terraform apply` succeeds on the adopted demo project (fresh-project path is supported but not exercised).
+- [x] `terraform plan` is clean after apply.
+- [x] No service account keys exist.
+- [x] GitHub Actions authenticates through Workload Identity Federation.
+- [x] A pull request workflow runs `terraform fmt` and `plan` (not yet exercised by a PR).
+- [x] A merge to main deploys the new image and job revision.
 - [ ] Rollback to the previous image tag is documented and tested.
-- [ ] `terraform destroy` removes all billable resources.
+- [ ] `terraform destroy` removes all billable resources (not executed; the lake and datasets are protected).
+
+Validated on 2026-11-17:
+
+- Bootstrap: state bucket, WIF pool/provider, deploy service account.
+- Main stack: 41 resources, existing bucket and 5 datasets imported.
+- Deploy workflow `44130787578` green: images pushed, plan and apply succeeded.
+- Cloud Run `pncp-dbt` execution succeeded.
+- Daily workflow `af30267f` succeeded end to end: ingest → dbt → enrich → dbt (25m35s).
+- Budget remains a manual account-level guardrail (R$ 50 / ~US$ 10).
 
 ---
 

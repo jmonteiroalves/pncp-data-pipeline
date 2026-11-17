@@ -22,6 +22,7 @@ This file records the significant decisions made during the design phase, the al
 | ADR-014 | Backfill in 3-day chunks | Accepted |
 | ADR-015 | Switch default model to Gemini 3.1 Flash-Lite | Accepted |
 | ADR-016 | Static Git-hosted dashboard instead of Looker Studio | Accepted |
+| ADR-017 | Terraform adoption of pre-existing demo resources | Accepted |
 
 ---
 
@@ -591,3 +592,46 @@ setup against the same Gold tables.
 - Interactivity is limited to chart tooltips; no date/category filters yet.
 - A scheduled refresh can be added in phase 6 with GitHub Actions.
 - The Looker Studio path remains available for a future enterprise version.
+
+---
+
+## ADR-017 — Terraform adoption of pre-existing demo resources
+
+**Date:** 2026-11-17
+**Status:** Accepted
+
+### Context
+
+The project, lake bucket, BigQuery datasets, and budget existed before Terraform
+was introduced. A fresh `terraform apply` must also remain possible for a new
+environment. Cloud Run Jobs validate that their container image exists, so
+images must be pushed before the job resources are created.
+
+### Decision
+
+- Use a `bootstrap/` root with local state to create the GCS state bucket,
+  Workload Identity Federation, and deploy service account.
+- Import the existing lake bucket and five BigQuery datasets into the main
+  remote state.
+- Keep the billing budget in the billing console, outside the deploy service
+  account, to avoid granting billing-account administration to CI.
+- Build and push images in GitHub Actions before `terraform apply`; pass the
+  commit SHA as `image_tag`.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|---|---|
+| Destroy and recreate the existing resources | Deletes the demo data and dashboard source |
+| Terraform `import` blocks | Fail on a fresh project, which would break reproducibility |
+| Give the deploy service account billing admin | Broader than needed for a demo |
+| Apply jobs with a placeholder image | Adds a second apply and a fragile bootstrap path |
+
+### Consequences
+
+- The current environment is managed by Terraform and the code still supports a
+  clean project.
+- Bootstrap uses local state; it is run once and documented.
+- Budget alerts remain a manual account-level guardrail.
+- A CI deploy always pushes both images before applying, so job updates are
+  atomic from the pipeline's perspective.

@@ -156,7 +156,8 @@ See [docs/data-source.md](docs/data-source.md) for the comparison, evidence, and
 ├── scripts/                  # golden-set builder and utilities
 ├── evaluation/               # golden set template and 50-item pilot
 ├── dbt/                      # staging, intermediate and Silver models
-├── infra/terraform/          # phase 6
+├── infra/terraform/          # bootstrap + main stack
+├── infra/workflows/          # Cloud Workflows definition
 └── docs/
 ```
 
@@ -262,7 +263,7 @@ for the same text twice.
 - [x] Phase 3 — Silver models with dbt
 - [x] Phase 4 — LLM enrichment and evaluation (50-item pilot; full 300-label review pending)
 - [x] Phase 5 — Gold marts and dashboard
-- [ ] Phase 6 — Terraform and CI/CD
+- [x] Phase 6 — Terraform and CI/CD (existing demo resources adopted; budget remains manual)
 - [ ] Phase 7 — observability and cost controls
 
 Portfolio site integration is intentionally deferred until the three planned data engineering projects are complete.

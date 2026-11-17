@@ -91,6 +91,28 @@ Repository variables required:
 | `TF_STATE_BUCKET` | `pncp-pipeline-dev-tfstate` |
 | `ARTIFACT_REPOSITORY` | `pncp-pipeline` |
 
+## Rollback
+
+Images are immutable tags. Roll back a job by applying the previous tag:
+
+```bash
+terraform -chdir=infra/terraform apply \
+  -var="project_id=pncp-pipeline-dev" \
+  -var="region=us-central1" \
+  -var="image_tag=<previous-git-sha>"
+```
+
+Or, for a quick operational rollback:
+
+```bash
+gcloud run jobs update pncp-ingest \
+  --region us-central1 \
+  --image us-central1-docker.pkg.dev/pncp-pipeline-dev/pncp-pipeline/pipeline:<previous-sha>
+```
+
+Re-run the deploy workflow afterwards so Terraform reconciles the tag back to
+`main`. A Git revert is the preferred path because it keeps state and code aligned.
+
 ## Budget
 
 The US$ 10-equivalent budget (R$ 50) was created in the billing console before

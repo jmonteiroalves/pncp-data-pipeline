@@ -45,11 +45,14 @@ run_job:
         result: status
     - check:
         switch:
-          - condition: ${status.done == true and status.error != null}
-            raise: ${status.error}
           - condition: ${status.done == true}
-            next: finish
+            next: check_error
         next: wait
+    - check_error:
+        switch:
+          - condition: ${"error" in status}
+            raise: ${status.error}
+        next: finish
     - wait:
         call: sys.sleep
         args:
