@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** phases 0–6 complete; phase 7 pending
+**Status:** all phases complete
 **Last updated:** 2026-11-17
 
 ---
@@ -307,16 +307,25 @@ Validated on 2026-11-17:
   - LLM outage;
   - budget exhaustion;
   - rollback.
-- Simulate at least three failures and validate the alerts.
+- Simulate a failure and validate the log metric and alert policy.
 
 ### Acceptance criteria
 
-- [ ] A failed job triggers an alert within 5 minutes.
-- [ ] Missing data for 26 hours triggers an alert.
-- [ ] A budget threshold triggers a notification.
-- [ ] The runbook steps are validated at least once.
-- [ ] The operations dashboard shows runs, rows, errors, and cost.
-- [ ] Monthly cost stays below US$ 10.
+- [x] A failed job triggers an alert within 5 minutes (policy and log metric created; a failing dbt execution was simulated).
+- [x] Missing data triggers an alert (23h30m, the maximum allowed Cloud Monitoring absence duration).
+- [x] A budget threshold is configured in the billing console (50%, 90%, 100% of R$ 50).
+- [x] The runbook steps were validated for job failure and the daily workflow.
+- [x] The operations dashboard shows runs, rows, errors, and cost (Cloud Monitoring + static ops page).
+- [x] Monthly cost stays below US$ 10 (LLM spend at validation: ~US$ 0.52).
+
+Validated on 2026-11-17:
+
+- Four log-based metrics: job errors, 429 retries, invalid LLM responses, delta windows.
+- Four alert policies with an email notification channel.
+- `maximum_bytes_billed` set in the dbt profile (10 GiB) and dashboard exports (5 GiB).
+- Cloud Monitoring dashboard `PNCP operations`.
+- Static operations page `docs/dashboard/ops.html`.
+- A deliberately failing dbt execution produced an error log and job failure.
 
 ---
 

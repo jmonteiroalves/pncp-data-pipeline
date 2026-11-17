@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-11-17T18:09:18.367211+00:00",
+  "totals": {
+    "requests": 161,
+    "items": 2929,
+    "input_tokens": 358863,
+    "output_tokens": 265462,
+    "cost_usd": 0.515127,
+    "errors": 5,
+    "failed_runs": 1
+  },
+  "runs": [
+    {
+      "mode": "delta",
+      "entity": "contratacoes,contratos",
+      "status": "success",
+      "page_count": 106,
+      "record_count": 6804,
+      "started_at": "2026-11-17T17:20:27.263998+00:00",
+      "finished_at": "2026-11-17T17:34:52.555693+00:00",
+      "error_message": ""
+    },
+    {
+      "mode": "delta",
+      "entity": "contratacoes,contratos",
+      "status": "success",
+      "page_count": 102,
+      "record_count": 6647,
+      "started_at": "2026-11-17T17:02:06.017063+00:00",
+      "finished_at": "2026-11-17T17:17:27.274264+00:00",
+      "error_message": ""
+    },
+    {
+      "mode": "backfill",
+      "entity": "contratos",
+      "status": "success",
+      "page_count": 1,
+      "record_count": 500,
+      "started_at": "2026-11-17T13:32:45.745826+00:00",
+      "finished_at": "2026-11-17T13:33:06.527233+00:00",
+      "error_message": ""
+    },
+    {
+      "mode": "backfill",
+      "entity": "contratacoes",
+      "status": "failed",
+      "page_count": 25,
+      "record_count": 1206,
+      "started_at": "2026-11-17T13:21:47.059141+00:00",
+      "finished_at": "2026-11-17T13:31:37.965181+00:00",
+      "error_message": "received signal 15"
+    },
+    {
+      "mode": "backfill",
+      "entity": "contratacoes",
+      "status": "success",
+      "page_count": 1,
+      "record_count": 50,
+      "started_at": "2026-11-17T13:20:35.136255+00:00",
+      "finished_at": "2026-11-17T13:20:55.113959+00:00",
+      "error_message": ""
+    }
+  ],
+  "llm_daily": [
+    {
+      "dia": "2026-11-17",
+      "model_id": "gemini-3.1-flash-lite",
+      "items": 2679,
+      "input_tokens": 319961,
+      "output_tokens": 243260,
+      "cost_usd": 0.449827,
+      "errors": 5
+    },
+    {
+      "dia": "2026-11-17",
+      "model_id": "gemini-3.5-flash-lite",
+      "items": 250,
+      "input_tokens": 38902,
+      "output_tokens": 22202,
+      "cost_usd": 0.0653,
+      "errors": 0
+    }
+  ]
+}

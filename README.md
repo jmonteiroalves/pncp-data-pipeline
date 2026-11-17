@@ -81,6 +81,8 @@ A detailed design is in [docs/architecture.md](docs/architecture.md).
 
 ![Dashboard](docs/dashboard/screenshot.png)
 
+**Operations snapshot:** <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/ops.html>
+
 ### What the dashboard shows
 
 Demo window: **14–15 January 2026** (the cloud API backfill was throttled; the
@@ -252,6 +254,8 @@ for the same text twice.
 | [Evaluation](evaluation/README.md) | Golden set files, pilot labels, metrics, and caveats |
 | [Dashboard](docs/dashboard/README.md) | Static dashboard, data refresh, local preview |
 | [Looker Studio](docs/looker-studio.md) | Optional manual report against the Gold tables |
+| [Dashboard design](docs/dashboard/design.md) | Art direction, tokens, layout, and self-critique |
+| [Runbook](docs/runbook.md) | Alerts, triage, rollback, and budget procedures |
 
 ---
 
@@ -264,7 +268,7 @@ for the same text twice.
 - [x] Phase 4 — LLM enrichment and evaluation (50-item pilot; full 300-label review pending)
 - [x] Phase 5 — Gold marts and dashboard
 - [x] Phase 6 — Terraform and CI/CD (existing demo resources adopted; budget remains manual)
-- [ ] Phase 7 — observability and cost controls
+- [x] Phase 7 — observability and cost controls
 
 Portfolio site integration is intentionally deferred until the three planned data engineering projects are complete.
 

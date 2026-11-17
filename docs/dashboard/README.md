@@ -3,9 +3,12 @@
 Static, public dashboard generated from the Gold marts and served by GitHub Pages.
 
 - Page: `index.html`
+- Operations snapshot: `ops.html` (`ops-data.json`)
+- Design notes: `design.md`
 - Data: `data.json`
 - Generator: `scripts/export_dashboard.py`
 - URL: <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/>
+- Operations URL: <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/ops.html>
 - Screenshot: `screenshot.png`
 - Demo window: 14–15 January 2026
 

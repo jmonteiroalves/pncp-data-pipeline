@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Operações — PNCP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f3efe4;
+        --ink: #17231f;
+        --graphite: #5c6961;
+        --rule: #cfc6b4;
+        --seal: #a33b2b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.55 "Newsreader", Georgia, serif;
+      }
+      .page { width: min(1080px, calc(100% - 48px)); margin: 0 auto; padding: 30px 0 48px; }
+      .masthead {
+        display: flex; justify-content: space-between; align-items: baseline; gap: 20px;
+        border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink);
+        padding: 9px 0 11px; margin-bottom: 34px;
+      }
+      .wordmark { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; }
+      .meta, .label, th, td.num, footer {
+        font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--graphite);
+      }
+      h1 { margin: 0 0 8px; font-size: clamp(38px, 5vw, 64px); font-weight: 400; letter-spacing: -0.045em; line-height: 1; }
+      .intro { max-width: 66ch; margin: 0 0 28px; color: var(--graphite); }
+      .kpis { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+      .kpi { padding: 14px 16px 14px 0; border-right: 1px solid var(--rule); }
+      .kpi + .kpi { padding-left: 16px; }
+      .kpi:last-child { border-right: 0; }
+      .kpi strong { display: block; font-size: 30px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
+      .kpi span { display: block; font-size: 12px; color: var(--graphite); }
+      .section { margin-top: 34px; border-top: 1px solid var(--rule); padding-top: 13px; }
+      h2 { margin: 0 0 12px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+      table { width: 100%; border-collapse: collapse; }
+      th { text-align: left; font-weight: 500; border-bottom: 1px solid var(--ink); padding: 0 14px 6px 0; }
+      td { border-bottom: 1px dotted var(--rule); padding: 8px 14px 8px 0; font-size: 14px; vertical-align: top; }
+      th:last-child, td:last-child { padding-right: 0; }
+      td.num, th.num { text-align: right; }
+      .ok { color: #35586b; }
+      .fail { color: var(--seal); }
+      .empty { color: var(--graphite); padding: 18px 0; }
+      a { color: #35586b; text-underline-offset: 3px; }
+      footer { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 38px; padding-top: 10px; border-top: 2px solid var(--ink); }
+      @media (max-width: 760px) {
+        .kpis { grid-template-columns: 1fr 1fr; }
+        .kpi:nth-child(2n) { border-right: 0; }
+        .kpi:nth-child(n + 3) { border-top: 1px solid var(--rule); }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="masthead">
+        <div class="wordmark">Operações do pipeline</div>
+        <div class="meta"><a href="./index.html">voltar ao painel</a> · PNCP</div>
+      </header>
+
+      <h1>O que rodou, o que falhou</h1>
+      <p class="intro">
+        Últimas execuções de ingestão e o consumo de enriquecimento registrados nas tabelas de
+        controle. Alertas ao vivo ficam no Cloud Monitoring, no painel “PNCP operations”.
+      </p>
+
+      <section class="kpis" aria-label="Indicadores operacionais">
+        <div class="kpi"><strong id="kpi-runs">—</strong><span>execuções recentes</span></div>
+        <div class="kpi"><strong id="kpi-failures">—</strong><span>falhas recentes</span></div>
+        <div class="kpi"><strong id="kpi-items">—</strong><span>itens enviados ao LLM</span></div>
+        <div class="kpi"><strong id="kpi-cost">—</strong><span>custo estimado de IA</span></div>
+      </section>
+
+      <section class="section">
+        <h2>Execuções de ingestão</h2>
+        <table aria-label="Últimas execuções de ingestão">
+          <thead>
+            <tr><th>Início</th><th>Modo</th><th>Entidade</th><th class="num">Páginas</th><th class="num">Linhas</th><th>Status</th></tr>
+          </thead>
+          <tbody id="runsBody"><tr><td colspan="6" class="empty">Carregando…</td></tr></tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <h2>Consumo do LLM por dia</h2>
+        <table aria-label="Consumo de LLM por dia e modelo">
+          <thead>
+            <tr><th>Dia</th><th>Modelo</th><th class="num">Itens</th><th class="num">Tokens in</th><th class="num">Tokens out</th><th class="num">Custo</th><th class="num">Erros</th></tr>
+          </thead>
+          <tbody id="llmBody"><tr><td colspan="7" class="empty">Carregando…</td></tr></tbody>
+        </table>
+      </section>
+
+      <footer>
+        <span>Fonte: control.ingestion_runs e control.llm_requests · dbt/BigQuery</span>
+        <span id="generated">—</span>
+      </footer>
+    </main>
+
+    <script>
+      const num = new Intl.NumberFormat("pt-BR");
+      const usd = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "USD", maximumFractionDigits: 4 });
+      const dt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
+
+      fetch("./ops-data.json")
+        .then((response) => {
+          if (!response.ok) throw new Error("ops-data.json não encontrado");
+          return response.json();
+        })
+        .then(render)
+        .catch((error) => {
+          document.getElementById("runsBody").innerHTML = `<tr><td colspan="6" class="empty">${error.message}. Gere com <code>python scripts/export_ops.py</code>.</td></tr>`;
+        });
+
+      function render(data) {
+        const t = data.totals;
+        document.getElementById("kpi-runs").textContent = num.format(data.runs.length);
+        document.getElementById("kpi-failures").textContent = num.format(t.failed_runs);
+        document.getElementById("kpi-items").textContent = num.format(t.items);
+        document.getElementById("kpi-cost").textContent = usd.format(t.cost_usd);
+        document.getElementById("generated").textContent = `atualizado em ${dt.format(new Date(data.generated_at))}`;
+
+        document.getElementById("runsBody").innerHTML = data.runs
+          .map(
+            (run) => `
+            <tr>
+              <td>${run.started_at ? dt.format(new Date(run.started_at)) : "—"}</td>
+              <td>${run.mode}</td>
+              <td>${run.entity}</td>
+              <td class="num">${num.format(run.page_count)}</td>
+              <td class="num">${num.format(run.record_count)}</td>
+              <td class="${run.status === "success" ? "ok" : "fail"}">${run.status}${run.error_message ? ` — ${run.error_message.slice(0, 70)}` : ""}</td>
+            </tr>`
+          )
+          .join("");
+
+        document.getElementById("llmBody").innerHTML = data.llm_daily.length
+          ? data.llm_daily
+              .map(
+                (row) => `
+                <tr>
+                  <td>${row.dia}</td>
+                  <td>${row.model_id}</td>
+                  <td class="num">${num.format(row.items)}</td>
+                  <td class="num">${num.format(row.input_tokens)}</td>
+                  <td class="num">${num.format(row.output_tokens)}</td>
+                  <td class="num">${usd.format(row.cost_usd)}</td>
+                  <td class="num">${num.format(row.errors)}</td>
+                </tr>`
+              )
+              .join("")
+          : `<tr><td colspan="7" class="empty">Sem requisições registradas.</td></tr>`;
+      }
+    </script>
+  </body>
+</html>

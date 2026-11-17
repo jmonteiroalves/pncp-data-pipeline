@@ -19,6 +19,7 @@ env:
   ARTIFACT_REPOSITORY: ${{ vars.ARTIFACT_REPOSITORY || 'pncp-pipeline' }}
   TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
   TF_IN_AUTOMATION: "true"
+  TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
 
 jobs:
   deploy:

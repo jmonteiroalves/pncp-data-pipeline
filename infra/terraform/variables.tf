@@ -69,6 +69,12 @@ variable "scheduler_timezone" {
   default     = "America/Sao_Paulo"
 }
 
+variable "alert_email" {
+  description = "Optional email for Cloud Monitoring alerts."
+  type        = string
+  default     = ""
+}
+
 variable "scheduler_cron" {
   description = "Cron expression for the daily pipeline."
   type        = string

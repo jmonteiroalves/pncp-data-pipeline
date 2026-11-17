@@ -13,7 +13,8 @@ from pncp_pipeline.config import get_settings
 
 
 def _rows(client: bigquery.Client, sql: str) -> list[dict[str, Any]]:
-    return [dict(row) for row in client.query(sql).result()]
+    config = bigquery.QueryJobConfig(maximum_bytes_billed=5_000_000_000)
+    return [dict(row) for row in client.query(sql, job_config=config).result()]
 
 
 def main() -> int:

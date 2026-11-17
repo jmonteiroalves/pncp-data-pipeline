@@ -11,3 +11,4 @@ pncp:
       timeout_seconds: 300
       priority: interactive
       job_retries: 1
+      maximum_bytes_billed: 10000000000

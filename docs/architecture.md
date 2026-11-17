@@ -532,17 +532,17 @@ Structured JSON with `severity`, `run_id`, `job`, `step`, `source`, `endpoint`, 
 
 | Alert | Condition | Severity |
 |---|---|---|
-| Job failed | Cloud Run job execution failed | Page |
-| No fresh data | Gold freshness > 26 h | Page |
-| High 429 rate | More than 10% of requests in 15 min | Warning |
-| Invalid LLM responses | More than 1% in a run | Warning |
-| Budget threshold | 50%, 90%, 100% of US$ 10 | Warning/Page |
-| dbt test failures | Any test failure | Warning |
+| Job errors | Any `ERROR` log from a Cloud Run job, 5-minute window | Error |
+| 429 storm | More than 10 rate-limit retries in 15 minutes | Warning |
+| Invalid LLM responses | Any invalid structured response in 30 minutes | Warning |
+| No fresh data | `pncp_delta_ingested` metric absent for 23h30m (the maximum allowed absence window) | Error |
+| Budget threshold | Billing account budget at 50%, 90%, 100% (manual guardrail) | Warning/Page |
 
 ### Dashboards
 
-- **Operations:** run status, rows ingested, duration, 429 rate, LLM cost.
-- **Business:** spend by category, top agencies, monthly trend, classification coverage.
+- **Operations:** Cloud Monitoring dashboard `PNCP operations` with error logs, 429 retries, invalid LLM responses, and delta windows.
+- **Operations snapshot:** static `dashboard/ops.html` with recent runs, rows, LLM tokens, cost, and errors.
+- **Business:** static `dashboard/index.html` with category spend, daily evolution, top agencies, state coverage, and AI coverage.
 
 ---
 
@@ -584,7 +584,7 @@ Structured JSON with `severity`, `run_id`, `job`, `step`, `source`, `endpoint`, 
 | Budget threshold | Billing alert | Disable enrichment, keep ingestion and dbt running |
 | Image regression | CI tests or deploy health | Roll back to the previous Artifact Registry tag |
 
-Every recovery path is documented in a runbook created in phase 7.
+Every recovery path is documented in [runbook.md](runbook.md).
 
 ---
 
