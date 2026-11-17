@@ -65,12 +65,12 @@ Effort assumes one developer working part-time, with no prior code in the reposi
 - [x] `make setup` installs dependencies in a clean environment.
 - [x] `make lint` and `make test` pass locally.
 - [x] `docker build` produces an image under 500 MB (269 MiB on 2026-11-17).
-- [ ] CI runs lint and tests on every pull request.
+- [x] CI runs lint and tests on every pull request (first run green on 2026-11-17).
 - [x] No secrets are required to run the tests.
 - [x] README explains how to run the project locally.
 
 The container build was verified locally on 2026-11-17: 269 MiB, below the
-500 MB CI budget. The first CI run still depends on the first push.
+500 MB CI budget. The first CI run passed on 2026-11-17.
 
 ---
 

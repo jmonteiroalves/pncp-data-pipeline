@@ -1,5 +1,7 @@
 # PNCP Intelligent Data Pipeline
 
+[![CI](https://github.com/jmonteiroalves/pncp-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/jmonteiroalves/pncp-data-pipeline/actions/workflows/ci.yml)
+
 > An end-to-end batch data engineering project on Google Cloud that turns Brazil's public procurement notices into an analytics-ready, AI-enriched dataset.
 
 **Status:** phase 1 — repository scaffold complete locally; ingestion not implemented; no cloud resources provisioned.
@@ -235,7 +237,7 @@ for the same text twice.
 ## Status
 
 - [x] Phase 0 — data source validation and architecture design
-- [x] Phase 1 — repository scaffold, Docker (269 MiB), local tooling and CI workflow (first CI run pending push)
+- [x] Phase 1 — repository scaffold, Docker (269 MiB), local tooling and CI (green)
 - [x] Phase 2 — ingestion and Bronze layer (validated locally and against GCS/BigQuery)
 - [x] Phase 3 — Silver models with dbt
 - [x] Phase 4 — LLM enrichment and evaluation (50-item pilot; full 300-label review pending)
