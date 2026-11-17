@@ -1,0 +1,110 @@
+version: 2
+
+models:
+  - name: contratacoes
+    description: Deduplicated PNCP procurement notices at one row per control number.
+    columns:
+      - name: numero_controle_pncp
+        description: Natural key from PNCP.
+        data_tests:
+          - unique
+          - not_null
+      - name: objeto_compra
+        data_tests:
+          - not_null
+      - name: cnpj_orgao
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_orgao')
+                field: cnpj
+      - name: modalidade_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_modalidade')
+                field: modalidade_id
+      - name: data_publicacao_dia
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tempo')
+                field: data
+      - name: valor_estimado
+        description: Estimated value in BRL; null when the source omits it.
+
+  - name: contratos
+    description: Deduplicated PNCP contracts at one row per control number.
+    columns:
+      - name: numero_controle_pncp
+        data_tests:
+          - unique
+          - not_null
+      - name: objeto_contrato
+        data_tests:
+          - not_null
+      - name: cnpj_orgao
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_orgao')
+                field: cnpj
+      - name: data_publicacao_dia
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tempo')
+                field: data
+
+  - name: dim_orgao
+    description: One row per publishing agency.
+    columns:
+      - name: cnpj
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_unidade
+    description: One row per organisational unit.
+    columns:
+      - name: unidade_key
+        data_tests:
+          - unique
+          - not_null
+      - name: cnpj_orgao
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_orgao')
+                field: cnpj
+
+  - name: dim_modalidade
+    description: Procurement modality codes.
+    columns:
+      - name: modalidade_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_amparo_legal
+    description: Legal basis codes.
+    columns:
+      - name: amparo_legal_codigo
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_tempo
+    description: Daily calendar from 2020 to 2030.
+    columns:
+      - name: data
+        data_tests:
+          - unique
+          - not_null
+
+  - name: quarantine_contratacoes
+    description: Notices rejected by structural validation, with a reason.
+  - name: quarantine_contratos
+    description: Contracts rejected by structural validation, with a reason.

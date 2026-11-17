@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: Immutable PNCP payloads loaded by the ingestion job.
+    schema: bronze
+    tables:
+      - name: pncp_contratacoes_raw
+        description: One row per PNCP procurement notice, with raw JSON payload.
+        config:
+          loaded_at_field: ingested_at
+          freshness:
+            warn_after: { count: 26, period: hour }
+            error_after: { count: 48, period: hour }
+        columns:
+          - name: record_id
+            description: SHA-256 of the entity and canonical payload.
+            data_tests:
+              - unique
+              - not_null
+          - name: payload
+            description: Raw PNCP JSON.
+      - name: pncp_contratos_raw
+        description: One row per PNCP contract, with raw JSON payload.
+        config:
+          loaded_at_field: ingested_at
+          freshness:
+            warn_after: { count: 26, period: hour }
+            error_after: { count: 48, period: hour }
+        columns:
+          - name: record_id
+            description: SHA-256 of the entity and canonical payload.
+            data_tests:
+              - unique
+              - not_null
