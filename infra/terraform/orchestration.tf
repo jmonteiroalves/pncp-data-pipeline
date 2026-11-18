@@ -2,7 +2,7 @@ resource "google_workflows_workflow" "pipeline" {
   project         = var.project_id
   region          = var.region
   name            = "pncp-daily-pipeline"
-  description     = "PNCP ingest, dbt, enrichment, and Gold refresh"
+  description     = "PNCP monthly snapshot: ingest, dbt, enrichment, and Gold refresh"
   service_account = google_service_account.orchestrator.email
   source_contents = file("${path.module}/../workflows/pipeline.yaml")
 
@@ -24,7 +24,7 @@ resource "google_cloud_scheduler_job" "daily" {
   project     = var.project_id
   region      = var.region
   name        = "pncp-daily"
-  description = "Daily PNCP pipeline"
+  description = "Monthly PNCP snapshot (first Tuesday)"
   schedule    = var.scheduler_cron
   time_zone   = var.scheduler_timezone
 

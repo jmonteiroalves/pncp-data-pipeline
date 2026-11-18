@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** all phases complete
+**Status:** all phases complete; operating mode changed to a monthly snapshot on 2026-11-18
 **Last updated:** 2026-11-17
 
 ---
@@ -296,7 +296,7 @@ Validated on 2026-11-17:
 ### Tasks
 
 - Create log-based metrics for failures, 429s, and invalid LLM responses.
-- Create alert policies for job failure and stale data.
+- Create alert policies for job failure, 429, and invalid LLM responses.
 - Create budget alerts at 50%, 90%, and 100%.
 - Add `maximum_bytes_billed` to dashboard and dbt queries.
 - Build an operations dashboard.
@@ -312,20 +312,44 @@ Validated on 2026-11-17:
 ### Acceptance criteria
 
 - [x] A failed job triggers an alert within 5 minutes (policy and log metric created; a failing dbt execution was simulated).
-- [x] Missing data triggers an alert (23h30m, the maximum allowed Cloud Monitoring absence duration).
 - [x] A budget threshold is configured in the billing console (50%, 90%, 100% of R$ 50).
-- [x] The runbook steps were validated for job failure and the daily workflow.
+- [x] The runbook steps were validated for job failure and the monthly snapshot workflow.
 - [x] The operations dashboard shows runs, rows, errors, and cost (Cloud Monitoring + static ops page).
 - [x] Monthly cost stays below US$ 10 (LLM spend at validation: ~US$ 0.52).
 
-Validated on 2026-11-17:
+Validated on 2026-11-17; updated for monthly snapshots on 2026-11-18:
 
-- Four log-based metrics: job errors, 429 retries, invalid LLM responses, delta windows.
+- Four log-based metrics: job errors, 429 retries, invalid LLM responses, snapshot days.
 - Four alert policies with an email notification channel.
 - `maximum_bytes_billed` set in the dbt profile (10 GiB) and dashboard exports (5 GiB).
 - Cloud Monitoring dashboard `PNCP operations`.
 - Static operations page `docs/dashboard/ops.html`.
 - A deliberately failing dbt execution produced an error log and job failure.
+
+---
+
+## 9.1 Post-roadmap revision — monthly snapshot
+
+Approved on 2026-11-18 (ADR-018):
+
+- [x] One publication day per month, the **first Tuesday**.
+- [x] Schedule on **day 8** at 03:00 BRT; the job computes the first Tuesday and skips if the snapshot already succeeded.
+- [x] Gold accepts only dates with a successful `snapshot` run and only the current calendar year.
+- [x] Annual reset happens through the Gold full rebuild and current-year filter.
+- [x] Dashboard compares monthly snapshots instead of daily continuity.
+- [x] Cost estimate updated to ~US$ 0.70/month.
+- [ ] First scheduled day-8 run in production (manual seed snapshot used for validation).
+
+Validated on 2026-11-18 with the 2026-11-03 snapshot:
+
+- 5,583 notices and 8,117 contracts in Gold, all from the same snapshot date.
+- 91.0% AI coverage (5,083 of 5,583 notices classified, monthly cap reached).
+- 82/82 dbt nodes passing, including the snapshot-scope test.
+- Dashboard regenerated with monthly data and a new screenshot.
+
+The stale-data absence alert was removed because a monthly cadence exceeds
+Cloud Monitoring's 23h30m maximum absence window; job-error alerts cover failed
+snapshots.
 
 ---
 

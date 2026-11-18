@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: control
+    description: Pipeline control-plane tables.
+    schema: control
+    tables:
+      - name: ingestion_runs
+        description: One row per ingestion, snapshot, or delta run.
+        columns:
+          - name: run_id
+            tests:
+              - unique
+              - not_null
+          - name: mode
+            tests:
+              - not_null
+          - name: status
+            tests:
+              - not_null

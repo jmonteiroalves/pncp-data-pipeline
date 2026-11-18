@@ -68,3 +68,11 @@ select
     ingested_at,
     dbt_updated_at
 from joined
+where data_publicacao_dia >= date_trunc(current_date(), year)
+  and data_publicacao_dia in (
+      select start_date
+      from {{ source('control', 'ingestion_runs') }}
+      where mode = 'snapshot'
+        and status = 'success'
+        and start_date = end_date
+  )

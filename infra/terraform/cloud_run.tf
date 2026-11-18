@@ -12,7 +12,7 @@ resource "google_cloud_run_v2_job" "ingest" {
 
       containers {
         image = local.pipeline_image
-        args  = ["delta", "--window-days", "0"]
+        args  = ["snapshot"]
 
         resources {
           limits = {
@@ -102,7 +102,7 @@ resource "google_cloud_run_v2_job" "enrich" {
 
       containers {
         image = local.pipeline_image
-        args  = ["enrich", "--limit", "2000", "--batch-size", "20"]
+        args  = ["enrich", "--limit", "5000", "--batch-size", "20"]
 
         resources {
           limits = {

@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-**Last updated:** 2026-11-17
+**Last updated:** 2026-11-18
 
 This file records the significant decisions made during the design phase, the alternatives considered, and their consequences. Each decision is dated and has an explicit status.
 
@@ -23,6 +23,7 @@ This file records the significant decisions made during the design phase, the al
 | ADR-015 | Switch default model to Gemini 3.1 Flash-Lite | Accepted |
 | ADR-016 | Static Git-hosted dashboard instead of Looker Studio | Accepted |
 | ADR-017 | Terraform adoption of pre-existing demo resources | Accepted |
+| ADR-018 | Monthly first-Tuesday snapshot with annual Gold reset | Accepted |
 
 ---
 
@@ -635,3 +636,53 @@ images must be pushed before the job resources are created.
 - Budget alerts remain a manual account-level guardrail.
 - A CI deploy always pushes both images before applying, so job updates are
   atomic from the pipeline's perspective.
+
+---
+
+## ADR-018 — Monthly first-Tuesday snapshot with annual Gold reset
+
+**Date:** 2026-11-18
+**Status:** Accepted
+
+### Context
+
+The portfolio demo does not need daily freshness or complete coverage to prove
+the architecture. A 15-day refresh would require about 1,380 API pages and,
+with the current per-page BigQuery load, roughly seven hours. A single day is
+about 92 pages and fits the 60-minute job timeout without redesigning ingestion.
+
+### Decision
+
+- Run one **monthly snapshot** on the **first Tuesday** of the month.
+- Trigger it on **day 8** at 03:00 BRT; the job computes the first Tuesday and
+  skips if that snapshot already succeeded.
+- Snapshot one publication day for notices and contracts, all configured modalities.
+- Gold facts accept only dates with a successful `snapshot` run in
+  `control.ingestion_runs`, and only the current calendar year.
+- Gold tables are table models and are rebuilt each run, so the January run
+  removes the previous year.
+- The dashboard compares monthly snapshots rather than daily continuity.
+- The stale-data alert was removed: a monthly cadence cannot be expressed with
+  Cloud Monitoring's 23h30m maximum absence window. Job-error alerts cover failures.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|---|---|
+| Daily ingestion | More cost and freshness than the demo needs |
+| Every 15 days | ~7 hours of ingestion at the current per-page load |
+| Weekly Tuesday | ~US$ 3/month and 52 snapshots; more than necessary |
+| One day per quarter | Panel could look stale for months |
+| Keep all history | Storage and cost grow without portfolio benefit |
+
+### Consequences
+
+- Cost is roughly US$ 0.70/month at 4,000 monthly classifications.
+- One snapshot run takes about 30–40 minutes.
+- The dashboard shows one point per month; it is an architectural sample, not a
+  continuous national trend.
+- A failed snapshot does not create the success marker that Gold requires, so
+  the date stays out of the dashboard until a run succeeds.
+- The annual reset is automatic through the current-year filter.
+- A manual backfill or delta can still be run, but its dates are not displayed
+  unless they are recorded as snapshots.

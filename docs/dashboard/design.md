@@ -6,8 +6,8 @@
 - Audience: hiring managers and data practitioners reviewing the portfolio.
 - Job: make the scale and the AI classification credible at a glance, without
   looking like a generic analytics template.
-- Constraint: only two days of cloud data (14–15 January 2026), so the page
-  must not imply a long trend.
+- Constraint: one day per month (first Tuesday), so the page shows monthly
+  snapshots, not a continuous daily trend.
 
 ## Direction
 
@@ -17,7 +17,7 @@ editions and audit records, not from SaaS dashboards.
 
 It deliberately avoids the current defaults: no dark background with an acid
 accent, no identical rounded cards, no soft shadows, no gradient decoration, no
-eyebrow labels above every heading, and no fake trend line for two data points.
+eyebrow labels above every heading, and no fake trend line for a single monthly sample.
 
 ## Tokens
 
@@ -43,20 +43,20 @@ monospace so columns line up.
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│ Diário de Compras                         edição · 14–15 │
+│ Diário de Compras                      amostra mensal     │
 ├──────────────────────────────────────────────────────────┤
 │ O que o governo                    ┌───────────────┐     │
 │ compra                             │ CLASSIFICAÇÃO │     │
 │                                    │   POR IA      │     │
-│ lead paragraph                     │    99,7%      │     │
+│ lead paragraph                     │    91,0%      │     │
 │                                    └───────────────┘     │
 ├────────┬────────┬────────┬────────┬────────┬─────────────┤
-│ 2.206  │ 1.302  │ R$4,68 │ R$5,43 │ 99,7%  │             │
+│ 5.583  │ 2.407  │ R$33,1 │ R$1,30 │ 91,0%  │             │
 ├────────┴────────┴────────┴────────┴────────┴─────────────┤
 │ Valor por categoria           │ Amostra auditada          │
-│ horizontal ruled bars         │ stamp + day table         │
+│ horizontal ruled bars         │ stamp + month table       │
 ├───────────────────────────────┴───────────────────────────┤
-│ Dois dias, quatro categorias — grouped columns           │
+│ Uma terça por mês — grouped columns                       │
 ├───────────────────────────────┬───────────────────────────┤
 │ Órgãos                        │ Estados                   │
 └───────────────────────────────┴───────────────────────────┘
@@ -69,7 +69,7 @@ No card containers; sections are separated by rules and whitespace.
 
 1. The stamp is the one memorable element; everything else stays quiet.
 2. Every rule and column carries information (edition, section, table).
-3. Data honesty: two days are shown as two columns, not a trend line.
+3. Data honesty: monthly snapshots are compared as columns, not a daily trend line.
 4. Copy is specific and plain: what was counted, when, and how much the AI
    covered.
 5. No motion. The page should read like a printed edition.
@@ -80,5 +80,5 @@ The first pass was a dark SaaS dashboard with rounded cards, neon mint bars,
 and a gradient wash — exactly the default the brief warns against. The redesign
 replaces the card kit with a single page document, trades neon for a restrained
 ink-and-paper palette, and uses the stamp to make the AI coverage memorable
-without decorating every section. The daily chart changed from a line to
-grouped columns because a line implies a trend the two-day sample cannot support.
+without decorating every section. The chart is grouped columns by month because
+a line would imply a continuous trend the monthly sample cannot support.

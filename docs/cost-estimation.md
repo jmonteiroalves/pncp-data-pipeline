@@ -11,7 +11,7 @@
 
 This estimate covers the monthly operating cost of the pipeline described in [architecture.md](architecture.md):
 
-- daily ingestion from PNCP;
+- a monthly one-day snapshot from PNCP;
 - storage in Cloud Storage and BigQuery;
 - dbt transformations;
 - LLM enrichment of a sampled subset;
@@ -31,14 +31,15 @@ It does not cover:
 
 | Assumption | Value | Rationale |
 |---|---|---|
-| Historical backfill | 90 days | Enough for trend analysis without a long ingestion |
-| Notices per month | ~120,000 | 3,996 observed on a weekday × 30 |
-| Contracts per month | ~180,000 | 6,061 observed on a weekday × 30 |
-| BigQuery logical storage | ~5 GiB | Raw, Silver, Gold, and AI tables after 90 days |
-| Cloud Storage | ~1 GiB compressed | JSONL gzip, 90 days, lifecycle after 180 days |
-| Bytes scanned per month | ~50 GB | Daily dbt runs and dashboard queries with partition pruning |
-| Pipeline runs | 1 per day | Batch, not streaming; 45 min ingestion budget |
-| Enrichment volume | 10,000 unique descriptions per month | Deterministic sample with a monthly cap |
+| Operating mode | One monthly snapshot (first Tuesday) | Demo does not need daily freshness |
+| Historical backfill | 90 days, ad-hoc only | Optional; not part of the schedule |
+| Notices per snapshot | ~4,000 | 3,996 observed on a weekday |
+| Contracts per snapshot | ~6,000 | 6,061 observed on a weekday |
+| BigQuery logical storage | ~1 GiB | Current-year snapshots only |
+| Cloud Storage | ~1 GiB compressed | JSONL gzip, lifecycle after 180 days |
+| Bytes scanned per month | ~10 GB | Monthly dbt run and dashboard export |
+| Pipeline runs | 1 per month | Day 8, first Tuesday snapshot |
+| Enrichment volume | ~4,000 unique descriptions per month | All new descriptions in the snapshot |
 | Items per LLM request | 20 | Balances overhead and output reliability |
 | Input tokens per item | 137 | Measured on a 20-item batch |
 | Output tokens per item | 92 | Measured; includes category, subcategory, confidence, and justification |
@@ -104,17 +105,17 @@ Prices change. Revalidate before implementation and before publishing the estima
 | Cloud Storage — storage | 1 GiB | 5 GB | US$ 0.00 |
 | Cloud Storage — operations | < 5,000 Class A, < 50,000 Class B | Yes | US$ 0.00 |
 | BigQuery — storage | 5 GiB | 10 GiB | US$ 0.00 |
-| BigQuery — queries | 50 GB scanned | 1 TiB | US$ 0.00 |
-| Cloud Run Jobs — ingestion | 81,000 vCPU-s, 81,000 GiB-s | 240,000 / 450,000 | US$ 0.00 |
-| Cloud Run Jobs — dbt | 9,000 vCPU-s, 9,000 GiB-s | Shared with above | US$ 0.00 |
-| Cloud Run Jobs — enrichment | 18,000 vCPU-s, 18,000 GiB-s | Shared with above | US$ 0.00 |
+| BigQuery — queries | 10 GB scanned | 1 TiB | US$ 0.00 |
+| Cloud Run Jobs — ingestion | 1,800 vCPU-s, 1,800 GiB-s | 240,000 / 450,000 | US$ 0.00 |
+| Cloud Run Jobs — dbt | 300 vCPU-s, 300 GiB-s | Shared with above | US$ 0.00 |
+| Cloud Run Jobs — enrichment | 600 vCPU-s, 600 GiB-s | Shared with above | US$ 0.00 |
 | Cloud Scheduler | 3 jobs | 3 jobs | US$ 0.00 |
 | Cloud Workflows | ~1,200 internal steps | 5,000 steps | US$ 0.00 |
 | Artifact Registry | 0.6 GiB | 0.5 GiB | US$ 0.01 |
 | Cloud Logging | < 1 GiB | 50 GiB | US$ 0.00 |
 | **Subtotal** | | | **US$ 0.01** |
 
-Cloud Run calculation: 30 days × (45 min ingestion + 5 min dbt + 10 min enrichment) = 1,800 minutes = 108,000 seconds, with 1 vCPU and 1 GiB per job.
+Cloud Run calculation: one monthly run × (30 min ingestion + 5 min dbt + 10 min enrichment) = 45 minutes = 2,700 seconds, with 1 vCPU and 1 GiB per job.
 
 ### 4.2 AI enrichment
 
@@ -128,19 +129,19 @@ With 137 input tokens and 92 output tokens per item:
 
 | Component | Calculation | Cost |
 |---|---|---|
-| Input | 10,000 × 137 × US$ 0.25 / 1,000,000 | US$ 0.34 |
-| Output | 10,000 × 92 × US$ 1.50 / 1,000,000 | US$ 1.38 |
-| **Total** | | **US$ 1.72** |
+| Input | 4,000 × 137 × US$ 0.25 / 1,000,000 | US$ 0.14 |
+| Output | 4,000 × 92 × US$ 1.50 / 1,000,000 | US$ 0.55 |
+| **Total** | | **US$ 0.69** |
 
 ### 4.3 Total
 
 | Block | Cost |
 |---|---|
 | Compute and storage | US$ 0.01 |
-| AI enrichment | US$ 1.72 |
-| **Monthly total** | **US$ 1.73** |
+| AI enrichment | US$ 0.69 |
+| **Monthly total** | **US$ 0.70** |
 
-Rounded budget: **US$ 2 per month** for the demo, with a **US$ 10 budget alert threshold** as a safety margin. The measured cost in the pilot was **US$ 0.172 per 1,000 items**.
+Rounded budget: **US$ 1 per month** for the demo, with a **US$ 10 budget alert threshold** as a safety margin. The measured cost in the pilot was **US$ 0.172 per 1,000 items**.
 
 ---
 
@@ -151,7 +152,8 @@ Rounded budget: **US$ 2 per month** for the demo, with a **US$ 10 budget alert t
 | Monthly classifications | Standard cost | Batch API cost |
 |---:|---:|---:|
 | 1,000 | US$ 0.17 | US$ 0.09 |
-| 10,000 (demo cap) | US$ 1.72 | US$ 0.86 |
+| 4,000 (monthly snapshot) | US$ 0.69 | US$ 0.35 |
+| 10,000 (monthly cap) | US$ 1.72 | US$ 0.86 |
 | 60,000 | US$ 10.34 | US$ 5.17 |
 | 120,000 (full coverage) | US$ 20.67 | US$ 10.34 |
 
@@ -231,7 +233,7 @@ The US$ 300 new-customer trial credit covers the first months of this project wi
 
 ## 9. Conclusion
 
-At the approved scope — 90-day backfill, daily batch, 10,000 classifications per month, US multi-region — the expected operating cost is **under US$ 2 per month**. The dominant cost is the LLM, not the infrastructure.
+At the approved scope — one monthly snapshot, ~4,000 classifications per month, US multi-region — the expected operating cost is **under US$ 1 per month**. The dominant cost is the LLM, not the infrastructure.
 
 The main financial risks are accidental full-coverage enrichment, unbounded retries, and queries without partition pruning. All three are addressed by explicit caps, cache, and BigQuery guardrails.
 

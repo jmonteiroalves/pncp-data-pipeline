@@ -233,6 +233,20 @@ class SQLiteControlStore:
         )
         self._connection.commit()
 
+    def has_successful_snapshot(self, *, day: date) -> bool:
+        cursor = self._connection.execute(
+            """
+            SELECT 1 FROM ingestion_runs
+             WHERE mode = 'snapshot'
+               AND status = 'success'
+               AND start_date = ?
+               AND end_date = ?
+             LIMIT 1
+            """,
+            (day.isoformat(), day.isoformat()),
+        )
+        return cursor.fetchone() is not None
+
     def get_watermark(self, *, entity: str) -> date | None:
         cursor = self._connection.execute(
             "SELECT last_successful_date FROM watermarks WHERE entity = ?",

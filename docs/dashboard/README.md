@@ -10,7 +10,7 @@ Static, public dashboard generated from the Gold marts and served by GitHub Page
 - URL: <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/>
 - Operations URL: <https://jmonteiroalves.github.io/pncp-data-pipeline/dashboard/ops.html>
 - Screenshot: `screenshot.png`
-- Demo window: 14–15 January 2026
+- Demo window: first Tuesday of each month (scheduled on day 8)
 
 ## Refresh
 
@@ -22,8 +22,8 @@ git push
 ```
 
 The export queries `gold.fato_contratacao`, `gold.agg_gastos_categoria`,
-`gold.agg_orgaos`, `gold.agg_uf`, and `gold.agg_cobertura_ia`. It writes only
-aggregated data: no descriptions, suppliers, or personal data.
+`gold.agg_orgaos`, and `gold.agg_uf`. It writes only aggregated data: no
+descriptions, suppliers, or personal data.
 
 GitHub Pages serves the `docs/` folder from the `main` branch. The root
 `docs/index.html` redirects to `dashboard/`.

@@ -230,6 +230,11 @@ class EnrichmentPipeline:
                     },
                 )
 
+                if (batch_index + 1) % 10 == 0:
+                    self._store.save(enrichments, requests)
+                    enrichments.clear()
+                    requests.clear()
+
             self._store.save(enrichments, requests)
             finished_at = datetime.now(tz=UTC)
             return EnrichmentRunResult(

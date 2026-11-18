@@ -205,6 +205,20 @@ class BigQueryControlStore:
             ],
         )
 
+    def has_successful_snapshot(self, *, day: date) -> bool:
+        rows = self._query(
+            f"""
+            SELECT 1 FROM `{self._dataset}.ingestion_runs`
+             WHERE mode = 'snapshot'
+               AND status = 'success'
+               AND start_date = @day
+               AND end_date = @day
+             LIMIT 1
+            """,
+            [bigquery.ScalarQueryParameter("day", "DATE", day)],
+        )
+        return len(rows) > 0
+
     def get_watermark(self, *, entity: str) -> date | None:
         rows = self._query(
             f"""

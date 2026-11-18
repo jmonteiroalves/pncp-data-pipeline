@@ -1,15 +1,55 @@
 {
-  "generated_at": "2026-11-17T18:09:18.367211+00:00",
+  "generated_at": "2026-11-18T15:03:07.053556+00:00",
   "totals": {
-    "requests": 161,
-    "items": 2929,
-    "input_tokens": 358863,
-    "output_tokens": 265462,
-    "cost_usd": 0.515127,
-    "errors": 5,
-    "failed_runs": 1
+    "requests": 528,
+    "items": 10250,
+    "input_tokens": 1248583,
+    "output_tokens": 932751,
+    "cost_usd": 1.738491,
+    "errors": 18,
+    "failed_runs": 3
   },
   "runs": [
+    {
+      "mode": "snapshot",
+      "entity": "contratos",
+      "status": "success",
+      "page_count": 17,
+      "record_count": 8117,
+      "started_at": "2026-11-18T13:38:25.154082+00:00",
+      "finished_at": "2026-11-18T13:43:34.860624+00:00",
+      "error_message": ""
+    },
+    {
+      "mode": "snapshot",
+      "entity": "contratos",
+      "status": "failed",
+      "page_count": 0,
+      "record_count": 0,
+      "started_at": "2026-11-18T13:20:09.663801+00:00",
+      "finished_at": "2026-11-18T13:37:49.071472+00:00",
+      "error_message": "received signal 15"
+    },
+    {
+      "mode": "snapshot",
+      "entity": "contratacoes,contratos",
+      "status": "failed",
+      "page_count": 0,
+      "record_count": 0,
+      "started_at": "2026-11-18T12:47:10.311469+00:00",
+      "finished_at": "2026-11-18T13:19:40.982297+00:00",
+      "error_message": "server restart during contracts"
+    },
+    {
+      "mode": "delta",
+      "entity": "contratacoes,contratos",
+      "status": "success",
+      "page_count": 293,
+      "record_count": 23541,
+      "started_at": "2026-11-18T06:00:52.876234+00:00",
+      "finished_at": "2026-11-18T06:47:54.153836+00:00",
+      "error_message": ""
+    },
     {
       "mode": "delta",
       "entity": "contratacoes,contratos",
@@ -62,6 +102,15 @@
     }
   ],
   "llm_daily": [
+    {
+      "dia": "2026-11-18",
+      "model_id": "gemini-3.1-flash-lite",
+      "items": 7321,
+      "input_tokens": 889720,
+      "output_tokens": 667289,
+      "cost_usd": 1.223364,
+      "errors": 13
+    },
     {
       "dia": "2026-11-17",
       "model_id": "gemini-3.1-flash-lite",

@@ -146,7 +146,7 @@ Agencies publish and update records continuously. The API exposes two independen
 - `dataPublicacaoPncp` — when the notice first appeared.
 - `dataAtualizacaoGlobal` — when the record was last changed.
 
-This allows a clean incremental strategy: backfill by publication date, daily delta by update date.
+This allows a clean incremental strategy: backfill by publication date, daily delta by update date, and a monthly one-day snapshot for the demo.
 
 ### 4.7 Rate limiting — observed behaviour
 
@@ -165,7 +165,7 @@ There is no published quota in the OpenAPI document. Empirical tests on 2026-11-
 **Design consequence:** single worker, token bucket at ~0.8 requests/second,
 exponential backoff with jitter, checkpoint per day and modality, and no
 parallel ingestion. Long runs must budget for throttling; a 60-minute job
-timeout is adequate for a daily delta but not for a 90-day backfill.
+timeout is adequate for a one-day monthly snapshot but not for a 90-day backfill.
 
 ### 4.8 Data quality observations
 
@@ -272,11 +272,21 @@ Compras.gov.br remains an optional taxonomy reference. Portal da Transparência 
 - Checkpoint: `(date, modality, page)`.
 - Expected duration: several hours at 0.8 req/s; run in 3-day chunks and resume from checkpoints.
 
-### Daily delta
+### Monthly snapshot
+
+- Scheduled on day 8; the CLI computes the first Tuesday of the month.
+- Endpoint: `/v1/contratacoes/publicacao` for that single day, all configured modalities.
+- Contracts: `/v1/contratos` for the same day.
+- `control.ingestion_runs` records `mode = 'snapshot'`; Gold accepts only successful snapshot dates.
+- One day is ~92 pages and fits the 60-minute Cloud Run job timeout.
+- The annual reset is a Gold filter for the current calendar year.
+
+### Daily delta (optional)
 
 - Notices: `/v1/contratacoes/atualizacao` with `watermark - 2 days` to today.
 - Contracts: `/v1/contratos/atualizacao` with the same window.
 - Upsert by natural key.
+- Not part of the scheduled path after the monthly snapshot change.
 
 ### Watermarks
 
@@ -289,7 +299,7 @@ Stored in `control.watermarks`:
 
 ### Backfill safety
 
-- Do not run backfill and daily delta at the same time; the local SQLite backend is single-writer.
+- Do not run backfill, delta, and snapshot at the same time; the local SQLite backend is single-writer.
 - Use a separate job invocation with a distinct `run_id`.
 - Stop on repeated 429s and resume later from the checkpoint.
 - Verify row counts against `totalRegistros` returned by the API.

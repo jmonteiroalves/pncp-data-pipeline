@@ -53,11 +53,11 @@ resource "google_logging_metric" "llm_invalid" {
   }
 }
 
-resource "google_logging_metric" "delta_ingested" {
+resource "google_logging_metric" "snapshot_ingested" {
   project     = var.project_id
-  name        = "pncp_delta_ingested"
-  description = "Completed daily delta windows"
-  filter      = "resource.type=\"cloud_run_job\" AND jsonPayload.message=\"delta window ingested\""
+  name        = "pncp_snapshot_ingested"
+  description = "Completed monthly snapshot days"
+  filter      = "resource.type=\"cloud_run_job\" AND jsonPayload.message=\"day ingested\" AND jsonPayload.mode=\"snapshot\""
 
   metric_descriptor {
     metric_kind = "DELTA"
@@ -141,29 +141,6 @@ resource "google_monitoring_alert_policy" "llm_invalid" {
 
   notification_channels = local.alert_channels
   severity              = "WARNING"
-}
-
-resource "google_monitoring_alert_policy" "no_fresh_data" {
-  project      = var.project_id
-  display_name = "PNCP — no ingestion in 26 hours"
-  combiner     = "OR"
-
-  conditions {
-    display_name = "Daily delta metric is absent"
-
-    condition_absent {
-      filter   = "metric.type=\"logging.googleapis.com/user/pncp_delta_ingested\" AND resource.type=\"cloud_run_job\""
-      duration = "84600s"
-
-      aggregations {
-        alignment_period   = "3600s"
-        per_series_aligner = "ALIGN_COUNT"
-      }
-    }
-  }
-
-  notification_channels = local.alert_channels
-  severity              = "ERROR"
 }
 
 resource "google_monitoring_dashboard" "operations" {
@@ -250,12 +227,12 @@ resource "google_monitoring_dashboard" "operations" {
           width  = 6
           height = 4
           widget = {
-            title = "Daily delta windows"
+            title = "Snapshot days"
             xyChart = {
               dataSets = [{
                 timeSeriesQuery = {
                   timeSeriesFilter = {
-                    filter = "metric.type=\"logging.googleapis.com/user/pncp_delta_ingested\""
+                    filter = "metric.type=\"logging.googleapis.com/user/pncp_snapshot_ingested\""
                     aggregation = {
                       alignmentPeriod  = "3600s"
                       perSeriesAligner = "ALIGN_RATE"
@@ -264,7 +241,7 @@ resource "google_monitoring_dashboard" "operations" {
                 }
               }]
               timeshiftDuration = "0s"
-              yAxis             = { label = "windows", scale = "LINEAR" }
+              yAxis             = { label = "days", scale = "LINEAR" }
             }
           }
         }

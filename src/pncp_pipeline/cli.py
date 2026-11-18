@@ -7,7 +7,7 @@ import json
 import signal
 import sys
 from collections.abc import Sequence
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from types import FrameType
 from typing import cast
@@ -22,6 +22,7 @@ from pncp_pipeline.factory import build_context
 from pncp_pipeline.ingestion.pipeline import ALL_ENTITIES, IngestionPipeline
 from pncp_pipeline.log import configure_logging, get_logger
 from pncp_pipeline.pncp.models import Entity
+from pncp_pipeline.snapshot import snapshot_day_for
 
 logger = get_logger(__name__)
 
@@ -66,6 +67,21 @@ def build_parser() -> argparse.ArgumentParser:
     delta.add_argument("--window-days", type=_non_negative_int, default=0)
     delta.add_argument("--max-pages", type=_positive_int)
     delta.add_argument("--local", action="store_true")
+
+    snapshot = subparsers.add_parser(
+        "snapshot",
+        help="ingest the first Tuesday of the month as a monthly snapshot",
+    )
+    snapshot.add_argument("--date", type=_parse_date)
+    snapshot.add_argument(
+        "--entity",
+        choices=["all", "contratacoes", "contratos"],
+        default="all",
+    )
+    snapshot.add_argument("--modality", type=int, action="append", dest="modalities")
+    snapshot.add_argument("--max-pages", type=_positive_int)
+    snapshot.add_argument("--local", action="store_true")
+    snapshot.add_argument("--force", action="store_true")
 
     enrich = subparsers.add_parser(
         "enrich",
@@ -118,6 +134,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 130
         except Exception as exc:
             logger.exception("ingestion command failed")
+            print(json.dumps({"status": "failed", "error": str(exc)}))
+            return 1
+
+    if args.command == "snapshot":
+        _install_sigterm_handler()
+        try:
+            return _run_snapshot(args, settings)
+        except KeyboardInterrupt:
+            logger.warning("snapshot interrupted")
+            return 130
+        except Exception as exc:
+            logger.exception("snapshot command failed")
             print(json.dumps({"status": "failed", "error": str(exc)}))
             return 1
 
@@ -189,6 +217,63 @@ def _parse_date(value: str) -> date:
         return date.fromisoformat(value)
     except ValueError as exc:
         raise argparse.ArgumentTypeError(f"invalid date: {value}") from exc
+
+
+def _run_snapshot(args: argparse.Namespace, settings: Settings) -> int:
+    today = datetime.now(tz=UTC).date()
+    snapshot_day = args.date or snapshot_day_for(today)
+    if snapshot_day > today:
+        print(
+            json.dumps(
+                {
+                    "status": "skipped",
+                    "reason": "snapshot date is in the future",
+                    "snapshot_date": snapshot_day.isoformat(),
+                }
+            )
+        )
+        return 0
+
+    entities: tuple[Entity, ...] = (
+        ALL_ENTITIES if args.entity == "all" else (cast(Entity, args.entity),)
+    )
+    modalities = tuple(args.modalities) if args.modalities else tuple(settings.pncp_modalities)
+    if any(code < 1 or code > 99 for code in modalities):
+        raise ValueError("modality codes must be between 1 and 99")
+
+    context = build_context(settings, local=bool(args.local))
+    try:
+        if not args.force and context.control.has_successful_snapshot(day=snapshot_day):
+            print(
+                json.dumps(
+                    {
+                        "status": "skipped",
+                        "reason": "snapshot already completed",
+                        "snapshot_date": snapshot_day.isoformat(),
+                    }
+                )
+            )
+            return 0
+
+        pipeline = IngestionPipeline(
+            client=context.client,
+            store=context.store,
+            loader=context.loader,
+            control=context.control,
+        )
+        result = pipeline.snapshot(
+            day=snapshot_day,
+            entities=entities,
+            modalities=modalities,
+            max_pages=args.max_pages,
+        )
+    finally:
+        context.close()
+
+    payload = result.to_dict()
+    payload["snapshot_date"] = snapshot_day.isoformat()
+    print(json.dumps(payload, indent=2, ensure_ascii=False))
+    return 0
 
 
 def _run_enrichment(args: argparse.Namespace, settings: Settings) -> int:

@@ -40,7 +40,7 @@ flowchart TB
   end
 
   subgraph Orchestration
-    SCH["Cloud Scheduler<br/>daily cron"]
+    SCH["Cloud Scheduler<br/>monthly snapshot"]
     WF["Cloud Workflows<br/>DAG + retries"]
   end
 
@@ -97,7 +97,7 @@ flowchart TB
 
 | Component | Responsibility | Configuration |
 |---|---|---|
-| Cloud Scheduler | Triggers the daily workflow | `0 3 * * *`, `America/Sao_Paulo` |
+| Cloud Scheduler | Triggers the monthly snapshot workflow | `0 3 8 * *`, `America/Sao_Paulo` |
 | Cloud Workflows | Sequences jobs, applies retries, stops on failure | One workflow, internal steps only |
 | Cloud Run Job `ingest` | Paginates the PNCP API, writes raw files, loads BigQuery Bronze | 1 vCPU, 1 GiB, timeout 3,600 s, task count 1 |
 | Cloud Run Job `dbt` | Runs `dbt build` for Silver and Gold | 1 vCPU, 1 GiB, timeout 1,800 s |
@@ -117,22 +117,27 @@ flowchart TB
 
 ## 5. End-to-end data flow
 
-### Daily run
+### Monthly snapshot run
 
-1. **03:00 BRT** — Cloud Scheduler invokes the workflow with an OIDC token.
-2. **Workflow** starts the `ingest` job.
-3. **Ingest** reads watermarks from `control.watermarks`.
-4. For each configured PNCP modality, it calls `/v1/contratacoes/atualizacao` from the last successful date (1-day overlap) to today.
+1. **Day 8, 03:00 BRT** — Cloud Scheduler invokes the workflow with an OIDC token.
+2. **Workflow** starts the `snapshot` job.
+3. **Snapshot** computes the first Tuesday of the current month. It skips if the date is in the future or if a successful snapshot already exists in `control.ingestion_runs`.
+4. For each configured PNCP modality, it calls `/v1/contratacoes/publicacao` for that single day. Contracts use `/v1/contratos` for the same day.
 5. Pages are fetched at ~0.8 requests/second; HTTP 429 triggers exponential backoff with jitter.
 6. Each page is written as a `.jsonl.gz` object whose name includes a content hash; the run id is stored as object metadata.
-7. The same run also fetches `/v1/contratos/atualizacao` for the same window.
-8. The page is loaded into a staging table and MERGEd into Bronze on `(source_date, record_id)`.
+7. The page is loaded into a staging table and MERGEd into Bronze on `(source_date, record_id)`.
+8. The snapshot ignores day checkpoints so it can re-read the day and capture corrections. Deduplication still prevents duplicate rows.
 9. The ingest job records row counts and finishes; the workflow starts the `dbt` job.
 10. **dbt** rebuilds staging and Silver models with `merge` incremental logic, then runs tests.
 11. If Silver tests pass, the workflow starts the `enrich` job.
 12. **Enrich** selects unique, sampled descriptions that are not in the cache, builds batches of 20, calls Gemini with a JSON schema, validates the response, and appends valid results to `ai.classificacao`.
-13. **dbt** runs again for Gold models, joining Silver facts to the latest valid classification, then runs tests.
+13. **dbt** runs again for Gold models. The Gold fact tables are table models, so they are rebuilt and filtered to:
+    - the current calendar year;
+    - publication dates that have a successful `snapshot` run.
 14. **Workflow** completes; `control.ingestion_runs` holds status, counts, duration, and errors.
+15. The dashboard export runs separately (`make dashboard`) and updates the static page.
+
+A monthly snapshot of one day keeps the demo small and still shows a month-over-month story. The daily delta and ad-hoc backfill commands remain available, but they are not part of the scheduled path.
 
 ### Backfill run
 
@@ -142,7 +147,7 @@ the 90-day window. It records a checkpoint per date and modality in
 resumes on the next incomplete day. A crash mid-day re-fetches that day;
 `record_id` deduplication prevents duplicate Bronze rows.
 
-Backfill and daily runs share the same writer and deduplication rules.
+Backfill, delta, and snapshot runs share the same writer and deduplication rules. Only snapshot dates are accepted by the Gold models.
 
 ---
 
@@ -339,8 +344,9 @@ but long runs must budget for throttling and use the 60-minute job timeout.
 
 ### Incremental window
 
-- Daily delta starts at the last successful date (a 1-day overlap) and runs to today.
-- The update endpoint is heavier than the publication endpoint: a 3-day window for one modality returned 5,886 notices in validation. A weekly 7-day sweep catches late corrections without paying for that volume every day.
+- The scheduled path is a **monthly snapshot**: one publication day (the first Tuesday) per month.
+- The delta endpoint remains available for ad-hoc corrections, but it is not scheduled.
+- A snapshot re-reads the whole day and ignores day checkpoints, so corrections are picked up without duplicating rows.
 - Backfill is bounded to 90 days for the demo.
 - Each modality is ingested independently, so a failure in one does not block the others.
 
@@ -370,7 +376,7 @@ The `ai` models and the Gold analytical marts arrive in phases 4 and 5.
 |---|---|---|
 | Staging | View | No storage cost, always current |
 | Intermediate | Table | Deduplicated once per build |
-| Silver entities | Incremental `merge` | Efficient daily updates by natural key |
+| Silver entities | Incremental `merge` | Efficient updates by natural key |
 | Dimensions | Table | Small and stable |
 | Analytics marts | Table | Dashboard performance |
 
@@ -481,7 +487,7 @@ filter by model and prompt version.
 - Row count compared with the 7-day median; alert if outside ±3 standard deviations.
 - Duplicate rate in Silver must stay below 1%.
 - Null rate for `objeto_compra` must stay below 2%.
-- Freshness: Gold must be updated within 26 hours.
+- Freshness: Gold is refreshed by the monthly snapshot on day 8; the expected gap is at most 35 days.
 - Quarantine rate must stay below 1% of ingested rows.
 - LLM invalid-response rate must stay below 1%.
 
@@ -535,14 +541,13 @@ Structured JSON with `severity`, `run_id`, `job`, `step`, `source`, `endpoint`, 
 | Job errors | Any `ERROR` log from a Cloud Run job, 5-minute window | Error |
 | 429 storm | More than 10 rate-limit retries in 15 minutes | Warning |
 | Invalid LLM responses | Any invalid structured response in 30 minutes | Warning |
-| No fresh data | `pncp_delta_ingested` metric absent for 23h30m (the maximum allowed absence window) | Error |
 | Budget threshold | Billing account budget at 50%, 90%, 100% (manual guardrail) | Warning/Page |
 
 ### Dashboards
 
-- **Operations:** Cloud Monitoring dashboard `PNCP operations` with error logs, 429 retries, invalid LLM responses, and delta windows.
+- **Operations:** Cloud Monitoring dashboard `PNCP operations` with error logs, 429 retries, invalid LLM responses, and snapshot days.
 - **Operations snapshot:** static `dashboard/ops.html` with recent runs, rows, LLM tokens, cost, and errors.
-- **Business:** static `dashboard/index.html` with category spend, daily evolution, top agencies, state coverage, and AI coverage.
+- **Business:** static `dashboard/index.html` with category spend, monthly snapshot comparison, top agencies, state coverage, and AI coverage.
 
 ---
 
@@ -630,15 +635,15 @@ No secrets are required. Access is granted through IAM and ADC.
 |---|---|---|
 | Notices per day | ~4,000 | 50 per page, ~80 pages |
 | Contracts per day | ~6,000 | 500 per page, ~12 pages |
-| Observed page latency | 1–6 s local; ~18 s cloud with per-page load/MERGE | Batch loads per day before deployment |
-| Daily delta, all modalities | 20–50 min | 60 min; split by modality if needed |
+| Observed page latency | 1–6 s local; ~18 s cloud with per-page load/MERGE | ~92 pages per snapshot |
+| Monthly snapshot, one day, all modalities | ~92 pages, ~28–40 min | 60-minute job timeout |
 | 3-day delta, one modality | 118 pages, over 10 min under throttling | Split or increase timeout |
-| 7-day backfill, all modalities | 381 pages observed, 31 min | Split into 3-day chunks if slower |
-| Bronze size after 90 days | ~2 GB raw | GCS lifecycle 180 days |
-| BigQuery logical storage | ~5 GiB | 10 GiB free tier |
-| LLM items per month | 10,000 | Monthly cap |
-| LLM requests per month | ~500 | 20 items per batch |
-| Dashboard queries | < 50 GB scanned per month | 1 TiB free tier |
+| 7-day backfill, all modalities | 381 pages observed, 31 min | Ad-hoc only; split into 3-day chunks |
+| Bronze size, current-year snapshots | ~1 GB raw | GCS lifecycle 180 days |
+| BigQuery logical storage | ~1 GiB | 10 GiB free tier |
+| LLM items per month | ~4,000 typical | 10,000 monthly cap |
+| LLM requests per month | ~200 | 20 items per batch |
+| Dashboard queries | < 10 GB scanned per month | 1 TiB free tier |
 
 If the backfill needs more than 60 minutes, split it into 3-day chunks or run
 it as a separate job with a 24-hour timeout. The API throttles aggressively on

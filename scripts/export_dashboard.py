@@ -50,29 +50,29 @@ def main() -> int:
         """,
     )
 
-    daily_rows = _rows(
+    monthly_rows = _rows(
         client,
         f"""
         SELECT
-            data_publicacao_dia AS dia,
+            DATE_TRUNC(data_publicacao_dia, MONTH) AS mes,
             categoria,
             SUM(valor_estimado) AS estimated_value
         FROM `{project}.gold.fato_contratacao`
         WHERE data_publicacao_dia IS NOT NULL
-        GROUP BY dia, categoria
-        ORDER BY dia
+        GROUP BY mes, categoria
+        ORDER BY mes
         """,
     )
-    days = sorted({str(row["dia"]) for row in daily_rows})
-    categories_in_daily = sorted({str(row["categoria"]) for row in daily_rows})
+    months = sorted({str(row["mes"]) for row in monthly_rows})
+    categories_in_monthly = sorted({str(row["categoria"]) for row in monthly_rows})
     series = []
-    for category in categories_in_daily:
+    for category in categories_in_monthly:
         values = {
-            str(row["dia"]): float(row["estimated_value"] or 0)
-            for row in daily_rows
+            str(row["mes"]): float(row["estimated_value"] or 0)
+            for row in monthly_rows
             if row["categoria"] == category
         }
-        series.append({"categoria": category, "values": [values.get(day, 0) for day in days]})
+        series.append({"categoria": category, "values": [values.get(month, 0) for month in months]})
 
     agencies = _rows(
         client,
@@ -103,14 +103,14 @@ def main() -> int:
         client,
         f"""
         SELECT
-            data_publicacao_dia AS dia,
+            DATE_TRUNC(data_publicacao_dia, MONTH) AS mes,
             COUNT(*) AS contratacoes,
             COUNTIF(tem_classificacao) AS classificadas,
             SAFE_DIVIDE(COUNTIF(tem_classificacao), COUNT(*)) AS cobertura
         FROM `{project}.gold.fato_contratacao`
         WHERE data_publicacao_dia IS NOT NULL
-        GROUP BY dia
-        ORDER BY dia
+        GROUP BY mes
+        ORDER BY mes
         """,
     )
 
@@ -133,7 +133,7 @@ def main() -> int:
             }
             for row in categories
         ],
-        "daily": {"labels": days, "series": series},
+        "monthly": {"labels": months, "series": series},
         "agencies": [
             {
                 "orgao": row["orgao"],
@@ -154,7 +154,7 @@ def main() -> int:
         ],
         "coverage": [
             {
-                "dia": str(row["dia"]),
+                "mes": str(row["mes"]),
                 "notices": int(row["contratacoes"] or 0),
                 "classified": int(row["classificadas"] or 0),
                 "coverage": float(row["cobertura"] or 0),

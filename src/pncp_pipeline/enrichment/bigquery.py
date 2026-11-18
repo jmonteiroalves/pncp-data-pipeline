@@ -89,11 +89,16 @@ class BigQueryEnrichmentStore:
         if limit <= 0:
             return []
         sql = f"""
-            SELECT DISTINCT objeto_compra
-              FROM `{self._project}.{self._silver}.contratacoes`
-             WHERE objeto_compra IS NOT NULL
-               AND TRIM(objeto_compra) != ''
-             ORDER BY objeto_compra
+            SELECT DISTINCT c.objeto_compra
+              FROM `{self._project}.{self._silver}.contratacoes` AS c
+              JOIN `{self._project}.{self._control}.ingestion_runs` AS r
+                ON c.data_publicacao_dia = r.start_date
+             WHERE c.objeto_compra IS NOT NULL
+               AND TRIM(c.objeto_compra) != ''
+               AND r.mode = 'snapshot'
+               AND r.status = 'success'
+               AND r.start_date = r.end_date
+             ORDER BY c.objeto_compra
              LIMIT @limit
         """
         config = bigquery.QueryJobConfig(

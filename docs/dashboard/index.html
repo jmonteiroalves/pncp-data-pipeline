@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Diário de Compras — PNCP</title>
+    <title>Diário de Compras — amostra mensal PNCP</title>
     <meta
       name="description"
-      content="Uma leitura das compras públicas brasileiras publicadas no PNCP, com classificação semântica por IA."
+      content="Uma amostra mensal das compras públicas brasileiras publicadas no PNCP, com classificação semântica por IA."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -285,19 +285,19 @@
     <main class="page">
       <header class="masthead">
         <div class="wordmark">Diário de Compras</div>
-        <div class="edition">edição 14–15 jan 2026 &nbsp;·&nbsp; PNCP</div>
+        <div class="edition">amostra mensal &nbsp;·&nbsp; primeira terça &nbsp;·&nbsp; PNCP</div>
       </header>
 
       <section class="hero">
         <div>
           <h1>O que o governo<br />compra</h1>
           <p class="lead">
-            <strong>2.206 contratações</strong> publicadas no Portal Nacional de Contratações
-            Públicas em dois dias de janeiro. A IA classificou 99,7% delas em sete categorias.
+            Uma amostra mensal das contratações publicadas no Portal Nacional de Contratações
+            Públicas na primeira terça-feira de cada mês. A IA classifica as descrições em sete categorias.
           </p>
           <p class="byline">
-            Os valores são os estimados nos editais e os homologados quando informados. A
-            classificação é uma amostra auditada, não um retrato definitivo de toda a compra pública.
+            Os valores são os estimados nos editais e os homologados quando informados. Cada edição
+            olha um dia por mês, e o histórico do painel é reiniciado no começo de cada ano.
           </p>
         </div>
 
@@ -312,7 +312,7 @@
         <div class="stat">
           <span class="stat-label">Contratações</span>
           <span class="stat-value" id="kpi-notices">—</span>
-          <span class="stat-note">publicadas no período</span>
+          <span class="stat-note">no dia da amostra</span>
         </div>
         <div class="stat">
           <span class="stat-label">Órgãos</span>
@@ -349,11 +349,11 @@
             <h3>Amostra auditada</h3>
             <p>
               Cada descrição é classificada em uma categoria, com confiança e justificativa.
-              O painel mostra a cobertura por dia.
+              O painel mostra a cobertura por mês.
             </p>
-            <table aria-label="Cobertura da classificação por dia">
+            <table aria-label="Cobertura da classificação por mês">
               <thead>
-                <tr><th>Dia</th><th class="num">Contratações</th><th class="num">Cobertura</th></tr>
+                <tr><th>Mês</th><th class="num">Contratações</th><th class="num">Cobertura</th></tr>
               </thead>
               <tbody id="coverageBody">
                 <tr><td colspan="3">Carregando…</td></tr>
@@ -365,11 +365,11 @@
 
       <section class="section">
         <div class="section-head">
-          <h2>Dois dias, quatro categorias</h2>
+          <h2>Uma terça por mês</h2>
           <p class="section-note">valores estimados · R$</p>
         </div>
         <div class="chart-wrap tall">
-          <canvas id="dailyChart" aria-label="Valor estimado por dia e categoria" role="img"></canvas>
+          <canvas id="monthlyChart" aria-label="Valor estimado por mês e categoria" role="img"></canvas>
         </div>
       </section>
 
@@ -427,7 +427,7 @@
         maximumFractionDigits: 1,
       });
       const num = new Intl.NumberFormat("pt-BR");
-      const dayLabel = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" });
+      const monthLabel = new Intl.DateTimeFormat("pt-BR", { month: "short", year: "2-digit" });
 
       Chart.defaults.color = "#5c6961";
       Chart.defaults.borderColor = "#cfc6b4";
@@ -506,12 +506,12 @@
         });
 
         const top = [...categories].sort((a, b) => b.estimated_value - a.estimated_value).slice(0, 4);
-        new Chart(document.getElementById("dailyChart"), {
+        new Chart(document.getElementById("monthlyChart"), {
           type: "bar",
           data: {
-            labels: data.daily.labels.map((label) => dayLabel.format(new Date(`${label}T00:00:00`))),
+            labels: data.monthly.labels.map((label) => monthLabel.format(new Date(`${label}T00:00:00`))),
             datasets: top.map((row) => {
-              const match = data.daily.series.find((item) => item.categoria === row.categoria);
+              const match = data.monthly.series.find((item) => item.categoria === row.categoria);
               return {
                 label: row.categoria,
                 data: match ? match.values : [],
@@ -591,7 +591,7 @@
           .map(
             (row) => `
             <tr>
-              <td>${dayLabel.format(new Date(`${row.dia}T00:00:00`))}</td>
+              <td>${monthLabel.format(new Date(`${row.mes}T00:00:00`))}</td>
               <td class="num">${num.format(row.notices)}</td>
               <td class="num coverage-cell">${(row.coverage * 100).toFixed(1)}%</td>
             </tr>`

@@ -41,6 +41,8 @@ class IngestionPipeline:
         entities: Sequence[Entity] = ALL_ENTITIES,
         modalities: Sequence[int] = (),
         max_pages: int | None = None,
+        mode: str = "backfill",
+        use_checkpoints: bool = True,
     ) -> RunResult:
         """Ingest a historical window by publication date."""
         if start > end:
@@ -50,7 +52,7 @@ class IngestionPipeline:
         started_at = datetime.now(tz=UTC)
         self._control.start_run(
             run_id=run_id,
-            mode="backfill",
+            mode=mode,
             entity=",".join(entities),
             start_date=start,
             end_date=end,
@@ -64,7 +66,7 @@ class IngestionPipeline:
             for entity in entities:
                 for day in _date_range(start, end):
                     for modality in _modalities_for(entity, modalities):
-                        if self._control.is_day_complete(
+                        if use_checkpoints and self._control.is_day_complete(
                             entity=entity,
                             day=day,
                             modality=modality,
@@ -104,6 +106,7 @@ class IngestionPipeline:
                             "day ingested",
                             extra={
                                 "entity": entity,
+                                "mode": mode,
                                 "date": day.isoformat(),
                                 "modality": modality,
                                 "pages": pages,
@@ -121,7 +124,7 @@ class IngestionPipeline:
             )
             return RunResult(
                 run_id=run_id,
-                mode="backfill",
+                mode=mode,
                 entities=list(entities),
                 start_date=start,
                 end_date=end,
@@ -140,10 +143,34 @@ class IngestionPipeline:
                 record_count=record_count,
                 error=_error_message(exc),
             )
-            logger.exception("backfill failed")
+            logger.exception("%s failed", mode)
             raise
         finally:
             reset_run_context()
+
+    def snapshot(
+        self,
+        *,
+        day: date,
+        entities: Sequence[Entity] = ALL_ENTITIES,
+        modalities: Sequence[int] = (),
+        max_pages: int | None = None,
+    ) -> RunResult:
+        """Ingest one publication day as a monthly snapshot.
+
+        Checkpoints are intentionally ignored so a later run can pick up
+        corrections. The run is recorded with mode ``snapshot`` and is the only
+        kind of run that the Gold models accept.
+        """
+        return self.backfill(
+            start=day,
+            end=day,
+            entities=entities,
+            modalities=modalities,
+            max_pages=max_pages,
+            mode="snapshot",
+            use_checkpoints=False,
+        )
 
     def delta(
         self,

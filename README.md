@@ -46,11 +46,11 @@ These are targets, not measured results yet.
 | Target | Value |
 |---|---|
 | Historical backfill | 90 days |
-| Daily refresh | once per day, Gold available by 06:00 America/Sao_Paulo |
+| Refresh cadence | monthly snapshot on the first Tuesday (job on day 8) |
 | Classification quality | macro-F1 ≥ 0.85 on a manually labelled golden set |
-| LLM volume | up to 10,000 unique descriptions per month |
-| Operational cost | ≤ US$ 10 per month, with budget alerts |
-| Data freshness | Gold layer less than 26 hours old |
+| LLM volume | ~4,000 unique descriptions per snapshot (10,000 monthly cap) |
+| Operational cost | ~US$ 1 per month, with budget alerts |
+| Data freshness | Gold refreshed monthly by the day-8 snapshot job |
 | Reproducibility | full stack provisioned from an empty project with Terraform |
 
 ---
@@ -85,16 +85,18 @@ A detailed design is in [docs/architecture.md](docs/architecture.md).
 
 ### What the dashboard shows
 
-Demo window: **14–15 January 2026** (the cloud API backfill was throttled; the
-7-day local backfill is validated separately).
+The public dashboard is a **monthly snapshot**: one publication day — the first
+Tuesday of each month — with the current calendar year as its history window.
+It shows category spend, a month-to-month comparison, top agencies, state
+coverage, and the AI coverage rate. The values are an architectural sample, not
+a continuous national total.
 
-- **2,206 notices**, **1,302 agencies**, **R$ 4.68 bn** estimated.
-- **99.7% AI coverage** (2,199 of 2,206 notices).
-- Leading categories by estimated value: **Saúde** (R$ 1.25 bn), **Serviços
-  gerais** (R$ 839 m), **Transporte** (R$ 717 m), **Infraestrutura** (R$ 658 m).
-- The largest single category by count is **Serviços gerais** (519 notices).
-- The dashboard shows category spend, daily evolution, top agencies, state
-  coverage, and the AI coverage rate.
+Current edition (3 November 2026):
+
+- **5,583 notices** from **2,407 agencies**, R$ 33.1 bn estimated and
+  R$ 1.3 bn awarded.
+- **8,117 contracts** published on the same day.
+- **91.0% AI coverage** (5,083 of 5,583 notices classified).
 
 ---
 
@@ -276,7 +278,7 @@ Portfolio site integration is intentionally deferred until the three planned dat
 
 ## Non-goals
 
-- Real-time or streaming ingestion. The source is published in batches and daily refresh is sufficient.
+- Real-time or streaming ingestion. The source is published in batches and a monthly snapshot is sufficient for the architecture demo.
 - Using an LLM for deterministic work such as parsing dates, normalising currency, deduplicating records, or deriving geographic keys.
 - Redistributing raw PNCP payloads. Only derived and aggregated data will be published.
 - Processing personal data. Descriptions are masked for CPF, phone numbers, and e-mail before any LLM call.

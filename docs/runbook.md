@@ -7,9 +7,8 @@
 | `PNCP — job errors` | Cloud Monitoring email | Any `ERROR` log from a Cloud Run job |
 | `PNCP — 429 storm` | Cloud Monitoring email | More than 10 rate-limit retries in 15 minutes |
 | `PNCP — invalid LLM responses` | Cloud Monitoring email | Gemini returned unparseable or misaligned JSON |
-| `PNCP — no ingestion in 23h30m` | Cloud Monitoring email | The daily delta metric stopped reporting |
 | Budget alert | Cloud Billing | 50%, 90%, or 100% of the R$ 50 monthly budget |
-| Operations dashboard | Cloud Monitoring → Dashboards → PNCP operations | Error, 429, invalid LLM, and delta volume |
+| Operations dashboard | Cloud Monitoring → Dashboards → PNCP operations | Error, 429, invalid LLM, and snapshot volume |
 
 ## First checks
 
@@ -36,6 +35,18 @@ gcloud logging read \
   'resource.type="cloud_run_job" AND resource.labels.job_name="pncp-ingest"' \
   --limit 50 --format='value(timestamp,severity,jsonPayload.message)'
 ```
+
+## Monthly snapshot missed
+
+The pipeline runs on day 8 and processes the first Tuesday of the month. If the
+job fails, the job-error alert fires. Re-run the snapshot manually:
+
+```bash
+python -m pncp_pipeline snapshot --date YYYY-MM-DD --force
+```
+
+The Gold models only accept dates with a successful `snapshot` run, so a
+failed snapshot does not leak partial data into the dashboard.
 
 ## 429 storm
 
@@ -126,7 +137,8 @@ notification channel configured in Terraform (`alert_email`).
 
 ## Known limits
 
-- The demo uses a two-day cloud window; the local Bronze has seven days.
+- The demo uses monthly one-day snapshots; Gold keeps only the current calendar
+  year, while the local Bronze retains seven days from the earlier backfill.
 - Budget alerts are configured in the billing console, not by the deploy
   service account.
 - The dashboard export is manual; a scheduled refresh can be added to GitHub

@@ -76,7 +76,7 @@ variable "alert_email" {
 }
 
 variable "scheduler_cron" {
-  description = "Cron expression for the daily pipeline."
+  description = "Cron expression for the monthly snapshot (day 8)."
   type        = string
-  default     = "0 3 * * *"
+  default     = "0 3 8 * *"
 }
